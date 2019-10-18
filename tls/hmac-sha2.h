@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cstdint>
+#include <vector>
 
 /// HMAC using SHA2
 ///
@@ -50,6 +51,8 @@ private:
 
     sha2 hash_for_output;
     std::vector<uint8_t> I_padding_origin;
+    int firstIndex = 0;
+    bool flag = true;
 
 };
 
