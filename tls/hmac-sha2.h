@@ -43,6 +43,14 @@ public:
   void update(const uint8_t* bytes, std::size_t size);
   /// Compute the digest.
   digest_storage digest();
+
+private:
+    std::vector<uint8_t> O_padding_origin;
+    sha2 hash_for_message;
+
+    sha2 hash_for_output;
+    std::vector<uint8_t> I_padding_origin;
+
 };
 
 #endif

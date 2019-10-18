@@ -30,15 +30,16 @@ hmac_sha2::hmac_sha2(const uint8_t* key, std::size_t keysize)
 
     for(size_t k = firstIndex; i < block_size; i++)
     {
-        padding_I.push_back(hasher[k] ^ 0x36);
+        I_padding_origin.push_back(hasher[k] ^ 0x36);
 
-        padding_O.push_back(hasher[k] ^ 0x5c);
+        O_padding_origin.push_back(hasher[k] ^ 0x5c);
     }
 }
 
 void hmac_sha2::update(const uint8_t* bytes, std::size_t size)
 {
   /// \todo Feed data to HMAC.
+    
 }
 
 hmac_sha2::digest_storage hmac_sha2::digest()
