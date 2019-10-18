@@ -10,6 +10,7 @@ class hkdf
 {
 
 public:
+  std::vector<uint8_t>  pseudo_random_key;
   typedef hmac_sha2 hmac;
 
   /// Derive PRK from salt and ikm using HKDF-Extract.
@@ -25,6 +26,8 @@ public:
   /// Run TLS' Derive-Secret.
   std::vector<uint8_t> derive_secret(const std::string& label,
                                      const std::vector<uint8_t>& messages);
+
+
 };
 
 #endif
