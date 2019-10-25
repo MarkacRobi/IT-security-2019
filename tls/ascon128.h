@@ -1,9 +1,10 @@
 #ifndef ASCON128_H
 #define ASCON128_H
-
+#include "string.h"
+#define CORRECT 0
 #include <array>
 #include <vector>
-
+#include <iostream>
 #include "../ascon/api.h"
 #include "basic-ae.h"
 
@@ -29,6 +30,9 @@ public:
   bool decrypt(std::vector<uint8_t>& plaintext, const std::vector<uint8_t>& ciphertext,
                const std::vector<uint8_t>& nonce_data,
                const std::vector<uint8_t>& additional_data = std::vector<uint8_t>()) const override;
-};
+  private:
+    key_storage key_holder;
+
+               };
 
 #endif
