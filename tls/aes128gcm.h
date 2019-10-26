@@ -10,6 +10,9 @@
 /// AES-GCM with 128 bit keys and 96 bit nonces.
 class aes128gcm : public basic_ae<16, 16>
 {
+  private:
+    key_storage key_holder;
+
 public:
   static constexpr std::size_t nonce_size = 12;
 
