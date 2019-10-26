@@ -27,6 +27,8 @@ public:
   std::vector<uint8_t> derive_secret(const std::string& label,
                                      const std::vector<uint8_t>& messages);
 
+  ///Helper functions
+  std::vector<uint8_t>trunc_to_l_bytes(const std::vector<uint8_t>& T, size_t length);
 
 };
 
