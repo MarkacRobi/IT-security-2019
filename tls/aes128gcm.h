@@ -34,6 +34,10 @@ public:
   bool decrypt(std::vector<uint8_t>& plaintext, const std::vector<uint8_t>& ciphertext,
                const std::vector<uint8_t>& nonce_data,
                const std::vector<uint8_t>& additional_data = std::vector<uint8_t>()) const override;
+
+
+  //helper functions
+  bool isXbitZero(size_t i, const std::vector<uint8_t>&X);             
 };
 
 #endif // AES128GCM_H
