@@ -10,7 +10,6 @@ class hkdf
 {
 
 public:
-  std::vector<uint8_t>  pseudo_random_key;
   typedef hmac_sha2 hmac;
 
   /// Derive PRK from salt and ikm using HKDF-Extract.
@@ -27,8 +26,13 @@ public:
   std::vector<uint8_t> derive_secret(const std::string& label,
                                      const std::vector<uint8_t>& messages);
 
-  ///Helper functions
+  ///Helper functions and variables
+  std::vector<uint8_t>  pseudo_random_key;
   std::vector<uint8_t>trunc_to_l_bytes(const std::vector<uint8_t>& T, size_t length);
+  uint8_t getFirstByte = 0xFF00;
+  uint8_t getSecondByte = 0xFF;
+  std::string getConcatened(const std::string& label);
+  
 
 };
 
