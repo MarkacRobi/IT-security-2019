@@ -158,10 +158,13 @@ std::vector<uint8_t> transferVectorData(const std::vector<uint8_t>& vectorParam)
 }
 
 std::vector<uint8_t> changeVectorData(const std::vector<uint8_t>& vectorParam, 
-                               const std::vector<uint8_t>& vectorParamSecond)
-{
+                               const std::vector<uint8_t>& vectorParamSecond, int xorValue = 0)
+{  
+  if(xorValue == 0)
+    xorValue = 1;
+
   std::vector<uint8_t> vectorForMaxInput;
-  int xorValue = 1;
+  
   unsigned int counter = 0;
   int sizeOfArray = vectorParam.size();
 
@@ -209,13 +212,13 @@ std::vector<uint8_t> mult_of_two_blocks(const std::vector<uint8_t>&X, const std:
       if(isXbitZero(i, X))
         Z[i + 1] = transferVectorData(Z[i]);
       else
-        Z[i + 1] = changeVectorData(Z[i], V_0[i]);
+        Z[i + 1] = changeVectorData(Z[i], V_0[i], caclXbit(i, X));
 
      uint8_t vi_lsb = calLeastSignificantBit(V_0, i);
 
       std::vector<uint8_t>temp_array(V_0[i]);
       if(vi_lsb != 0)
-        temp_array = changeVectorData(moveToRightSide(temp_array), R);
+        temp_array = changeVectorData(moveToRightSide(temp_array), R, vi_lsb);
 
       else
         temp_array = transferVectorData(moveToRightSide(temp_array));
