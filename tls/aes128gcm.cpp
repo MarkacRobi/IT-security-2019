@@ -14,6 +14,9 @@
 #define  HEX7 0xff00
 #define  HEX8 0xff
 #define  OR 0x80
+#define  VECTOR_SIZE_16 16
+#define  VECTOR_SIZE_0 0
+#define  ARRAY_SIZE 15
 
 // Take care to program the GCM specific functions in constant time,
 // meaning that no conditional branches or conditional loads that depend
@@ -38,7 +41,7 @@ aes128gcm::aes128gcm(const key_storage& key)
 {
   /// \todo Initialise with the given key.
     int sizeOfHolder = key.size();
-  unsigned int it = 0;
+  int it = 0;
   while(it < sizeOfHolder)
   {
     key_holder[it] = key[it];
@@ -51,7 +54,7 @@ std::vector<uint8_t> fillVector(const std::vector<uint8_t>& vectorInput)
 {
   std::vector<uint8_t> vectorForMaxInput;
   int sizeOfVector = vectorInput.size() - 4;
-  unsigned long ctr = 0;
+  int ctr = 0;
   while(ctr < sizeOfVector)
   {
         vectorForMaxInput.push_back(vectorInput[ctr]);
@@ -63,8 +66,8 @@ void aes128gcm::set_key(const key_storage& key)
 {
   /// \todo Reset the key.
 
-     int sizeOfHolder = key.size();
-  unsigned int it = 0;
+  int sizeOfHolder = key.size();
+  int it = 0;
   while(it < sizeOfHolder)
   {
     key_holder[it] = key[it];
@@ -108,7 +111,7 @@ std::vector<uint8_t> moveToRightSide(const std::vector<uint8_t>& vectorP)
 
   auto transferBit = 0;
 
-  unsigned int counter = 0;
+  int counter = 0;
 
   int sizeOfArray = vectorP.size();
 
@@ -143,7 +146,7 @@ std::vector<uint8_t> transferVectorData(const std::vector<uint8_t>& vectorParam)
 {
   std::vector<uint8_t> vectorForMaxInput;
 
-  unsigned int counter = 0;
+  int counter = 0;
 
   int sizeOfArray = vectorParam.size();
 
@@ -165,7 +168,7 @@ std::vector<uint8_t> changeVectorData(const std::vector<uint8_t>& vectorParam,
 
   std::vector<uint8_t> vectorForMaxInput;
   
-  unsigned int counter = 0;
+  int counter = 0;
   int sizeOfArray = vectorParam.size();
 
   while(counter < sizeOfArray)
@@ -198,14 +201,17 @@ uint8_t calLeastSignificantBit(const std::vector<std::vector<uint8_t>>&V_0, size
   return (V_0[i][15] & 1);
 }
 
-std::vector<uint8_t> mult_of_two_blocks(const std::vector<uint8_t>&X, const std::vector<uint8_t>&Y){
-    std::vector<uint8_t> R(16, 00000000);
+std::vector<uint8_t> mult_of_two_blocks(const std::vector<uint8_t>&X, const std::vector<uint8_t>&Y)
+{   
+    std::vector<std::vector<uint8_t>>V_0(129);
+    V_0[0] = transferVectorData(Y);
+
+    std::vector<uint8_t> R(VECTOR_SIZE_16, 000000);
     std::vector<std::vector<uint8_t>>Z(129);
     R[0] = 225;
 
-    Z[0].push_back(0);//da li treba for??
-    std::vector<std::vector<uint8_t>>V_0;
-    V_0[0] = transferVectorData(Y);
+    for(size_t i = 0; i < VECTOR_SIZE_16; i++)
+      Z[0].push_back(0);
 
     for(size_t i = 0; i < 128; i++)
     {
@@ -230,16 +236,18 @@ std::vector<uint8_t> mult_of_two_blocks(const std::vector<uint8_t>&X, const std:
     return return_vector;
 }
 
-std::vector <uint8_t> g_hash(const std::vector<uint8_t>&H, const std::vector<std::vector<uint8_t>>&X)
+std::vector<uint8_t> g_hash(const std::vector<uint8_t>& vector_data_h, const std::vector<std::vector<uint8_t>>& X)
 {
-  std::vector<std::vector<uint8_t>>Y_0(129);//??
-  Y_0[0].push_back(0);//for
+
+  std::vector<std::vector<uint8_t>>Y_0(129);
+  for(size_t i = 0; i < VECTOR_SIZE_16; i++)
+    Y_0[0].push_back(0);
   
   size_t i = 0;
   while(i < X.size())
   { 
     std::vector<uint8_t> temp_array = changeVectorData(Y_0[i], X[i]);
-    Y_0[++i] = mult_of_two_blocks(temp_array, H);//??
+    Y_0[++i] = mult_of_two_blocks(temp_array, vector_data_h);
     
   }
 
@@ -284,9 +292,10 @@ std::vector<uint8_t> calcYn(const std::vector<std::vector<uint8_t>> Y)
   return return_result;
 }
 
-std::vector<uint8_t> gctr(const std::array<uint8_t, 16>&K, const std::vector<uint8_t>&C_1, const std::vector<uint8_t>&X)
+std::vector<uint8_t> gctr(const std::array<uint8_t, 16>&K, 
+                          const std::vector<uint8_t>&C_1, 
+                          const std::vector<uint8_t>&X)
 { 
-
   aes128 aes128_(K.data());
   std::vector<uint8_t> Ek_Cn(16);
   std::vector<uint8_t> Ml;
@@ -311,8 +320,6 @@ std::vector<uint8_t> gctr(const std::array<uint8_t, 16>&K, const std::vector<uin
       Ci.push_back(temp);
     }
   }
-
-  
 
   for(size_t i = 0; i < n; i++)
   {
@@ -346,12 +353,245 @@ std::vector<uint8_t> gctr(const std::array<uint8_t, 16>&K, const std::vector<uin
   return gctr_return;
 }
 
+std::vector<uint8_t> helper_function_label(const std::vector<uint8_t>& additional_data, 
+                                           const std::vector<uint8_t>& data_vector_c,  
+                                           const std::array<uint8_t, 16>& key, 
+                                           const std::vector<uint8_t>& data_h, 
+                                           const std::vector<uint8_t>& data_j, 
+                                           const std::vector<uint8_t>& check_vector)
+
+{
+  std::vector<uint8_t> firstVectorAdditionalData, secondVectorDataC;
+  std::vector<uint8_t> vectorToBeExpand(VECTOR_SIZE_16, VECTOR_SIZE_0);
+  std::vector<std::vector<uint8_t>> vector_iks;
+  uint64_t additional_data_size, data_vector_c_size;
+  additional_data_size = (uint64_t)additional_data.size()*8;
+  data_vector_c_size = (uint64_t)data_vector_c.size()*8;
+  std::vector<uint8_t> cv = check_vector; 
+  
+
+  size_t index = 0; 
+  while(index < additional_data.size())
+  {
+    firstVectorAdditionalData.push_back(additional_data[index]);
+
+    index++;
+  }
+
+
+  size_t temp_value;
+  size_t index_second = 0; 
+  temp_value = VECTOR_SIZE_16*std::ceil((double)additional_data.size()/float(VECTOR_SIZE_16));
+  temp_value -= additional_data.size();
+
+  while(index_second < temp_value)
+  {
+    firstVectorAdditionalData.push_back(VECTOR_SIZE_0);
+
+    index_second++; 
+  }
+
+
+  size_t index_third = 0; 
+  while(index_third < data_vector_c.size())
+  {
+    secondVectorDataC.push_back(data_vector_c[index_third]);
+
+    index_third++;
+  }
+
+  size_t temp_value_second; 
+  size_t index_fourth = 0; 
+  temp_value_second = VECTOR_SIZE_16*std::ceil((double)data_vector_c.size()/float(VECTOR_SIZE_16));
+  temp_value_second -= data_vector_c.size();
+
+  while(index_fourth < temp_value_second)
+  {
+
+    secondVectorDataC.push_back(VECTOR_SIZE_0);
+
+    index_fourth++;
+  }
+
+  size_t idx_one = 0;
+  size_t idx_two = 7;
+  while(idx_one < 8)
+  {
+    vectorToBeExpand[idx_one] = (uint8_t)((additional_data_size>>(idx_two*8))&HEX8);
+
+    idx_one++;
+    idx_two--;
+  }
+
+  size_t idx_one_sec = 8;
+  size_t idx_two_sec = 7;
+  while(idx_one_sec < VECTOR_SIZE_16)
+  {
+    vectorToBeExpand[idx_one_sec] = (uint8_t)((data_vector_c_size>>(idx_two_sec*8))&HEX8);
+
+    idx_one_sec++;
+    idx_two_sec--;
+  }
+
+  if(firstVectorAdditionalData.size()>VECTOR_SIZE_0){
+
+
+    if(firstVectorAdditionalData.size() <= VECTOR_SIZE_16){
+
+      vector_iks.push_back(firstVectorAdditionalData);
+    }
+
+    else{
+
+      size_t size_for_n, idx, first_vector_size; 
+      idx = 0;
+      first_vector_size=firstVectorAdditionalData.size();
+      size_for_n= first_vector_size/VECTOR_SIZE_16;
+      
+
+      while(idx < size_for_n)
+      {
+        std::vector<uint8_t> my_temp_value;
+
+        size_t new_idx; 
+        new_idx = idx*VECTOR_SIZE_16; 
+
+        size_t new_temp = (idx+1)*VECTOR_SIZE_16; 
+        while(new_idx < new_temp)
+        {
+          my_temp_value.push_back(firstVectorAdditionalData[new_idx]);  
+          new_idx++;
+        }
+        
+
+        vector_iks.push_back(my_temp_value);
+        idx++;
+      }
+      
+    }
+  }
+
+  if(secondVectorDataC.size()>VECTOR_SIZE_0){
+
+
+    if(secondVectorDataC.size() <= VECTOR_SIZE_16){
+
+      vector_iks.push_back(secondVectorDataC);
+    }
+
+    else{
+
+      size_t size_for_n, idx, first_vector_size; 
+      idx = 0;
+      first_vector_size=secondVectorDataC.size();
+      size_for_n= first_vector_size/VECTOR_SIZE_16;
+      
+
+      while(idx < size_for_n)
+      {
+        std::vector<uint8_t> my_temp_value;
+
+        size_t new_idx; 
+        new_idx = idx*VECTOR_SIZE_16; 
+
+        size_t new_temp = (idx+1)*VECTOR_SIZE_16; 
+        while(new_idx < new_temp)
+        {
+          my_temp_value.push_back(secondVectorDataC[new_idx]);  
+          new_idx++;
+        }
+        
+
+        vector_iks.push_back(my_temp_value);
+        idx++;
+      }
+      
+    }
+  }
+  
+
+  vector_iks.push_back(vectorToBeExpand);
+
+
+  std::vector<uint8_t> return_vector, ghash_vector; 
+  
+
+
+  ghash_vector = g_hash(data_h, vector_iks);
+
+
+
+  return_vector = gctr(key, data_j, ghash_vector);
+
+
+
+  return return_vector;
+  
+}
+
 bool aes128gcm::encrypt(std::vector<uint8_t>& ciphertext, const std::vector<uint8_t>& plaintext,
                         const std::vector<uint8_t>& nonce_data,
                         const std::vector<uint8_t>& additional_data) const
 {
   /// \todo Encrypt plaintext using AES-GCM with the given nonce and additional data.
-  return false;
+  //return false;
+  aes128 aes(key_holder.data());
+  std::vector<uint8_t> check_vector(VECTOR_SIZE_16, VECTOR_SIZE_16);
+  std::vector<uint8_t> data_h(VECTOR_SIZE_16, VECTOR_SIZE_0);
+  std::vector<uint8_t> data_j(VECTOR_SIZE_16, VECTOR_SIZE_0);
+  
+  aes.encrypt(data_h.data(),data_h.data());
+
+  
+  data_j[ARRAY_SIZE]=1;
+
+
+  size_t index = 0;
+  while(index < nonce_data.size())
+  {
+
+    data_j[index]=nonce_data[index];
+    index++;
+  }
+
+
+  std::vector<uint8_t> data_vector_c;
+  std::vector<uint8_t> data_vector_t;
+
+  data_vector_c = gctr(key_holder, 
+                       calcVectorHex(data_j), 
+                       plaintext);
+
+
+  data_vector_t = helper_function_label(additional_data, 
+                                        data_vector_c, 
+                                        key_holder, 
+                                        data_h, 
+                                        data_j, 
+                                        check_vector);
+  
+
+  size_t ind = 0; 
+  while(ind < data_vector_c.size())
+  {
+    ciphertext.push_back(data_vector_c[ind]);
+
+    ind++;
+  }
+
+  size_t ind_sec = 0;
+  while(ind_sec < data_vector_t.size())
+  {
+    ciphertext.push_back(data_vector_t[ind_sec]);
+
+    ind_sec++; 
+  }
+
+
+
+    
+  return true;
+
 }
 
 bool aes128gcm::decrypt(std::vector<uint8_t>& plaintext, const std::vector<uint8_t>& ciphertext,
@@ -359,5 +599,66 @@ bool aes128gcm::decrypt(std::vector<uint8_t>& plaintext, const std::vector<uint8
                         const std::vector<uint8_t>& additional_data) const
 {
   /// \todo Decrypt ciphertext using AEs-GCM with the given nonce and additional data.
-  return false;
+  //return false;
+  aes128 aes(key_holder.data());
+  std::vector<uint8_t> check_vector;
+  std::vector<uint8_t> vector_data_h(VECTOR_SIZE_16, VECTOR_SIZE_0);
+  std::vector<uint8_t> vector_data_j(VECTOR_SIZE_16, VECTOR_SIZE_0);
+  std::vector<uint8_t> vector_data_c;
+  std::vector<uint8_t> vector_data_t;
+
+  aes.encrypt(vector_data_h.data(), vector_data_h.data());
+
+  
+  vector_data_j[ARRAY_SIZE]=1;
+
+  size_t index, size_of_nonce_data; 
+  size_of_nonce_data = nonce_data.size();
+  index = 0; 
+  while(index < size_of_nonce_data)
+  {
+      vector_data_j[index] = nonce_data[index];
+
+      index++;
+  }
+
+  size_t size_of_cipher;
+  size_of_cipher = ciphertext.size() - 16;
+  size_t ind = 0; 
+  while(ind < size_of_cipher){
+    vector_data_c.push_back(ciphertext[ind]);
+    ind++;
+  }
+
+
+  size_t idy, cipher_size;
+  cipher_size = ciphertext.size();
+
+  idy = ciphertext.size()-16;
+  while(idy < cipher_size)
+  {
+    vector_data_t.push_back(ciphertext[idy]);
+
+    idy++;
+  }
+
+  plaintext = gctr(key_holder, calcVectorHex(vector_data_j), vector_data_c);
+
+  std::vector<uint8_t> vecotr_temp;
+  
+  vecotr_temp = helper_function_label(additional_data, 
+                                      vector_data_c, 
+                                      key_holder, 
+                                      vector_data_h, 
+                                      vector_data_j, 
+                                      check_vector);
+  
+
+  if(vector_data_t != vecotr_temp)
+  {
+    return false;
+
+  }
+
+  return true;
 }
