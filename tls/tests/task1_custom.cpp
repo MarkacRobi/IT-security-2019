@@ -3,6 +3,8 @@
 #include "../counter.h"
 #include "../hmac-sha2.h"
 #include "../ascon128.h"
+#include "../aes128gcm.h"
+#include "../hkdf.h"
 
 using util::operator""_k;
 using util::operator""_x;
@@ -73,7 +75,7 @@ namespace
 // }
 // END_TEST
 
-//check if counter is working correctly on few nonces
+//check if counter is working correctly
 START_TEST(nounce_test_1) {
     vector<incrementing_nonce> nonces;
 
@@ -93,6 +95,30 @@ START_TEST(nounce_test_1) {
     }
 
 }
+END_TEST
+
+//check reset
+START_TEST(nounce_test_2) {
+        vector<incrementing_nonce> incremented_nonces;
+        vector<incrementing_nonce> original_nonces;
+
+        for(unsigned int i = 0; i < 50; i++) {
+            incremented_nonces.push_back(incrementing_nonce(nonce_test_data_1));
+            original_nonces.push_back(incrementing_nonce(nonce_test_data_1));
+        }
+
+        for(unsigned int i = 0; i < 50; i++) {
+            for(incrementing_nonce nonce: incremented_nonces) {
+                ++nonce;
+            }
+        }
+        incrementing_nonce first_nonce = incremented_nonces[0];
+
+        for(unsigned int i = 0; i < 50; i++) {
+            ck_assert_uint_eq(memcmp(incremented_nonces[i].nonce().data(), original_nonces[i].nonce().data(), first_nonce.nonce().size()), 0);
+        }
+
+    }
 END_TEST
 
 START_TEST(hmac_test1) {
@@ -135,6 +161,55 @@ START_TEST(ascon_test1) {
 }
 END_TEST
 
+START_TEST(aes_gcm_test1) {
+        incrementing_nonce nonce(nonce_data);
+        ++nonce;
+
+        aes128gcm aesgcm(key);
+
+        vector<uint8_t> plaintext = {};
+        vector<uint8_t> ciphertext = {};
+        bool res = aesgcm.encrypt(ciphertext, plaintext, nonce.nonce());
+        ck_assert_uint_eq(res, true);
+        ck_assert_uint_eq(ciphertext.size(), plaintext.size() + aes128gcm::additional_size);
+
+
+        vector<uint8_t> plaintext_2;
+        res = aesgcm.decrypt(plaintext_2, ciphertext, nonce.nonce());
+
+        ck_assert_uint_eq(res, true);
+        ck_assert_array_split_eq(plaintext, plaintext_2);
+
+
+        ++nonce;
+        vector<uint8_t> ciphertext2 = {};
+        res = aesgcm.encrypt(ciphertext2, plaintext, nonce.nonce());
+        ck_assert_uint_eq(res, true);
+
+        vector<uint8_t> decryptedText;
+        res = aesgcm.decrypt(decryptedText, ciphertext2, nonce.nonce());
+
+        ck_assert_uint_eq(res, true);
+        ck_assert_array_split_eq(plaintext, decryptedText);
+}
+END_TEST
+
+START_TEST(hkdf_test1)
+    {
+        const vector<uint8_t> ikm          = ""_x;
+        const vector<uint8_t> salt         = {};
+        const vector<uint8_t> info         = {};
+        const uint8_t l                    = 0;
+        const vector<uint8_t> okm_expected = ""_x;
+
+        hkdf kdf(salt, ikm);
+        const auto okm = kdf.expand(info, l);
+        ck_assert_array_split_eq(okm, okm_expected);
+    }
+END_TEST
+
+
+
 
 int main(int argc, char** argv)
 {
@@ -142,6 +217,7 @@ int main(int argc, char** argv)
 
     TCase* tCase_nonce = tcase_create("Nonce test");
     tcase_add_test(tCase_nonce, nounce_test_1);
+    tcase_add_test(tCase_nonce, nounce_test_2);
     suite_add_tcase(suite, tCase_nonce);
 
     TCase* tCase_hmac = tcase_create("Hmac test");
@@ -152,6 +228,13 @@ int main(int argc, char** argv)
     tcase_add_test(tCase_ascon, ascon_test1);
     suite_add_tcase(suite, tCase_ascon);
 
+    TCase* tCase_aes_gcm= tcase_create("Aes gcm test");
+    tcase_add_test(tCase_aes_gcm, aes_gcm_test1);
+    suite_add_tcase(suite, tCase_aes_gcm);
+
+    TCase* tCase_hkdf= tcase_create("Hkdf test");
+    tcase_add_test(tCase_hkdf, hkdf_test1);
+    suite_add_tcase(suite, tCase_hkdf);
   // TCase* tcase = tcase_create("FIRST");
   // tcase_add_test(tcase, custom_1);
   // suite_add_tcase(suite, tcase);
