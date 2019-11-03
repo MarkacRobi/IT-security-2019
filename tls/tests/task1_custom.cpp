@@ -1,5 +1,13 @@
 #include "helpers.h"
 #include <check.h>
+#include "../counter.h"
+#include "../hmac-sha2.h"
+#include "../ascon128.h"
+
+using util::operator""_k;
+using util::operator""_x;
+
+using namespace std;
 
 // Include your custom testc ases here
 // Write at LEAST 5 custom tests to verify your own implementation.
@@ -29,8 +37,30 @@
 
 namespace
 {
-  // include the constants you need for your test here
-  // const std::string test_string = "its_2019";
+    std::vector<uint8_t> nonce_test_data_1 = {0x00, 0x10, 0x20, 0x30, 0x40, 0x50,
+                                         0x60, 0x70, 0x80, 0x90, 0xa0, 0xb0};
+
+    // FIPS 198a A.1
+    const uint8_t key_fips_1[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,
+                                  0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15,
+                                  0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20,
+                                  0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b,
+                                  0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36,
+                                  0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f};
+
+    const uint8_t text_fips_1[] = {'S', 'a', 'm', 'p', 'l', 'e', ' ', '#', '1'};
+
+    const ascon128::key_storage key       = "ffffffffffffffffffffffffffffffff"_k;
+    const std::vector<uint8_t> nonce_data = "000102030405060708090a0b0c0d0e0f"_x;
+
+    const std::string plaintext_1 = "abcdefghijklmnoqrstuvwxyz0123456789ABCDEFGHIJKLMNOQRSTUVWXYZ";
+    const std::string ad_1        = util::to_hex_string(plaintext_1);
+    const std::vector<uint8_t> expected_1 =
+            "7fc2b392364bcfe8fbc6417889e1c908beebf6e7378f96065df6616e10eb"
+            "c798f1180f8d9188c8e4672558381fb18e4165aea627fcc9f18c8a8f54e7"
+            "05615a12a7d5ef18b494b75eeca98879"_x;
+
+
 }
 
 // Sample to illustrate test:
@@ -43,18 +73,94 @@ namespace
 // }
 // END_TEST
 
+//check if counter is working correctly on few nonces
+START_TEST(nounce_test_1) {
+    vector<incrementing_nonce> nonces;
+
+    for(unsigned int i = 0; i < 1000; i++) {
+        nonces.push_back(incrementing_nonce(nonce_test_data_1));
+    }
+
+    for(unsigned int i = 0; i < 1000; i++) {
+        for(incrementing_nonce nonce: nonces) {
+            ++nonce;
+        }
+    }
+    incrementing_nonce first_nonce = nonces[0];
+
+    for (incrementing_nonce nonce: nonces) {
+        ck_assert_uint_eq(memcmp(first_nonce.nonce().data(), nonce.nonce().data(), first_nonce.nonce().size()), 0);
+    }
+
+}
+END_TEST
+
+START_TEST(hmac_test1) {
+
+    hmac_sha2 hmac(key_fips_1, sizeof(key_fips_1));
+
+    hmac.update(text_fips_1, sizeof(text_fips_1));
+    hmac_sha2::digest_storage tmp1 = hmac.digest();
+
+    hmac.update(text_fips_1, sizeof(text_fips_1));
+    hmac_sha2::digest_storage tmp2 = hmac.digest();
+
+    ck_assert_str_eq((util::to_hex_string(tmp1)).c_str(), (util::to_hex_string(tmp2)).c_str());
+}
+END_TEST
+
+START_TEST(ascon_test1) {
+        incrementing_nonce nonce(nonce_data);
+        ++nonce;
+
+        ascon128 ascon(key);
+
+        vector<uint8_t> ciphertext = {};
+        vector<uint8_t> plaintext = {};
+        bool res = ascon.encrypt(ciphertext, plaintext, nonce.nonce());
+
+        ck_assert_uint_eq(res, true);
+        ck_assert_uint_eq(ciphertext.size(), plaintext.size() + ascon128::additional_size );
+
+        ++nonce;
+        res = ascon.encrypt(ciphertext, plaintext, nonce.nonce());
+        ck_assert_uint_eq(res, true);
+
+        vector<uint8_t> decryptedText;
+        res = ascon.decrypt(decryptedText, ciphertext, nonce.nonce());
+
+        ck_assert_uint_eq(res, true);
+        ck_assert_array_split_eq(plaintext, decryptedText);
+
+}
+END_TEST
+
+
 int main(int argc, char** argv)
 {
-  Suite* suite = suite_create("Student Task 1 Tests");
+    Suite* suite = suite_create("Student Task 1 Tests");
+
+    TCase* tCase_nonce = tcase_create("Nonce test");
+    tcase_add_test(tCase_nonce, nounce_test_1);
+    suite_add_tcase(suite, tCase_nonce);
+
+    TCase* tCase_hmac = tcase_create("Hmac test");
+    tcase_add_test(tCase_hmac, hmac_test1);
+    suite_add_tcase(suite, tCase_hmac);
+
+    TCase* tCase_ascon = tcase_create("Ascon test");
+    tcase_add_test(tCase_ascon, ascon_test1);
+    suite_add_tcase(suite, tCase_ascon);
+
   // TCase* tcase = tcase_create("FIRST");
   // tcase_add_test(tcase, custom_1);
   // suite_add_tcase(suite, tcase);
 
-  SRunner* suite_runner = srunner_create(suite);
-  srunner_run(suite_runner, argc, argv);
+    SRunner* suite_runner = srunner_create(suite);
+    srunner_run(suite_runner, argc, argv);
 
-  int number_failed = srunner_ntests_failed(suite_runner);
-  srunner_free(suite_runner);
+    int number_failed = srunner_ntests_failed(suite_runner);
+    srunner_free(suite_runner);
 
-  return !number_failed ? EXIT_SUCCESS : EXIT_FAILURE;
+    return !number_failed ? EXIT_SUCCESS : EXIT_FAILURE;
 }
