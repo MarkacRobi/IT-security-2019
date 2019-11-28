@@ -62,6 +62,7 @@ find_package(Boost 1.62 REQUIRED COMPONENTS system)
 # add aubdirectories
 add_subdirectory(utils)
 add_subdirectory(ascon)
+add_subdirectory(isap)
 add_subdirectory(ecclib)
 add_subdirectory(tls)
 

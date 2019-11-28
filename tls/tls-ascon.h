@@ -10,7 +10,6 @@
 #include "./ascon128.h"
 #include "./counter.h"
 
-
 /// Oracle simulating application data record encryption and decryption for
 /// TLS 1.3 using ASCON as cipher suite.
 class tls13_ascon : public tls13_cipher
@@ -26,7 +25,6 @@ public:
   record encrypt(content_type type, const std::vector<uint8_t>& plaintext);
   virtual ~tls13_ascon();
   std::vector<uint8_t> addAdditionalData(record new_record, std::vector<uint8_t> vec);
-
 
 };
 

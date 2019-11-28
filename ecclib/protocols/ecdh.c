@@ -29,8 +29,9 @@ void ecdh_phase_one(eccp_point_affine_t* res, const gfp_t scalar, const eccp_par
  * @param scalar ephemeral or static private key (param->order_n_mont_data.prime_data.words large)
  * @param other_party_point the (ephemeral) public key of the other party
  * @param param elliptic curve parameters
+ * @return 1 on success, 0 on failure
  */
-void ecdh_phase_two(eccp_point_affine_t* res, const gfp_t scalar,
+int ecdh_phase_two(eccp_point_affine_t* res, const gfp_t scalar,
                     eccp_point_affine_t* other_party_point, const eccp_parameters_t* param)
 {
 
@@ -43,7 +44,7 @@ void ecdh_phase_two(eccp_point_affine_t* res, const gfp_t scalar,
 
   if (eccp_affine_point_is_valid(other_party_point, param) == 0)
   {
-    // TODO: error handling
+    return 0;
   }
 
   eccp_jacobian_point_multiply_L2R_DA(res, other_party_point, scalar, param);
@@ -54,4 +55,6 @@ void ecdh_phase_two(eccp_point_affine_t* res, const gfp_t scalar,
     gfp_montgomery_to_normal(res->x, res->x, &param->prime_data);
     gfp_montgomery_to_normal(res->y, res->y, &param->prime_data);
   }
+
+  return 1;
 }
