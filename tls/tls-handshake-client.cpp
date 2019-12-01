@@ -24,6 +24,7 @@ tls_handshake_client::tls_handshake_client(tls_record_layer& layer,
 
 alert_location tls_handshake_client::start_handshake(const std::vector<std::string>& psk_identities)
 {
+  //TODO:
   for (const std::string& psk_identity : psk_identities)
   {
     if (psks_.find(psk_identity) == psks_.end())
