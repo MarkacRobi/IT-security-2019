@@ -21,6 +21,18 @@ public:
   /// Run the server side of the handshake.
   alert_location answer_handshake();
 
+  //-----helper
+  //currentALert
+  alert_location currentAlert;
+  alert_location setCurrentAlert(alert_location currentAlert_);
+    alert_location checkError();
+    handshake_message_header returnClientHeader();
+    std::vector<uint8_t> getClientPayload(size_t payload_length_);
+    int num_32 = 32;
+
+    Extension getKeyShare(std::vector<uint8_t> clientPayload);
+    KeyShareEntry getKeyShareEntry(std::vector<uint8_t> clientPayload);
+
 private:
   alert_location read_client_hello();
   void send_server_hello();
