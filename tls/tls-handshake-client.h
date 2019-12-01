@@ -33,6 +33,7 @@ private:
   /// All available identities.
   const psk_map psks_;
 
+  std::vector<uint8_t> vector_of_client_msg; 
   /// ECDH instance.
   ecdh ecdh_;
   /// Fixed randomness if given.
