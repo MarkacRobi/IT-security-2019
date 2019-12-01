@@ -159,6 +159,22 @@ bool tls_record_layer::write_alert(AlertDescription alert)
   return ret;
 }
 
+bool tls_record_layer::setupAndInit(content_type type, const std::vector<uint8_t>& fragment,tls13_cipher::record& record )	
+	{	
+	  size_t sizeOfFragment = fragment.size();	
+	    record.header.type = type;	
+		
+	    record.header.version = TLSv1_2;	
+		
+	    	
+	    record.header.length = sizeOfFragment;	
+	    	
+	    	
+	    record.ciphertext = fragment;	
+		
+	    return true;	
+	}
+
 bool tls_record_layer::encrypt(content_type type, const std::vector<uint8_t>& fragment,
                                tls13_cipher::record& record)
 {
@@ -321,21 +337,7 @@ alert_location tls_record_layer::read(content_type type, std::vector<uint8_t>& d
   }
   return {local, ok};
 }
-bool tls_record_layer::setupAndInit(content_type type, const std::vector<uint8_t>& fragment,tls13_cipher::record& record )
-{
-  size_t sizeOfFragment = fragment.size();
-    record.header.type = type;
 
-    record.header.version = TLSv1_2;
-
-    
-    record.header.length = sizeOfFragment;
-    
-    
-    record.ciphertext = fragment;
-
-    return true;
-}
 std::vector<uint8_t> tls_record_layer::compute_early_secrets(const std::vector<uint8_t>& psk,
                                                              const std::vector<uint8_t>& messages)
 {
