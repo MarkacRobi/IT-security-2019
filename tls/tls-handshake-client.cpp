@@ -4,12 +4,15 @@
 #include "random.h"
 
 #define LEGACY_STANDARD_VERSION 0x0303
+#define TWO 2
 #define ONE 1
 #define ZERO 0
 #define EIGHT 8
 #define NULA 0x00
 #define DVAJES_TRI 0x17
 #define HEX_FF 0xff
+#define FOUR 4
+#define SIXTEEN 16
 
 tls_handshake_client::tls_handshake_client(tls_record_layer& layer, const psk_map& psks)
   : layer_(layer), psks_(psks), ecdh_(SECP256R1), fixed_randomness_({{0}}),
@@ -71,6 +74,7 @@ handshake_message_header handshake_message_header_;
 std::vector<uint8_t> vector_ecdh; 
 OfferedPsks offeredPSKS; 
 
+
 size_of_client_hello_message = 0;
 size_of_extention = 0; 
 //Set legacy standard version  
@@ -79,6 +83,8 @@ size_of_client_hello_message = size_of_client_hello_message + 2;
 handshake_message_header_.msg_type = handshake_types::CLIENT_HELLO; 
 vector_ecdh =ecdh_.get_data();
 size_t size_of_vector_ecdh = vector_ecdh.size();
+size_t size_of_hash;
+size_t index_for_payload_handshake = 45;
 
 if(!have_fixed_randomness_)
 {
@@ -173,7 +179,7 @@ for(std::string id : psk_identities_)
   size_t index = 0; 
   while(index < size_of_id)
   {
-    extension_type_pre_shared_key.data[size_of_data_key + index + 2] = (uint8_t) id[index];
+    extension_type_pre_shared_key.data[size_of_data_key + index + TWO] = (uint8_t) id[index];
     index++;
   }
   extension_type_pre_shared_key.data[size_of_data_key + size_of_id + 3] = ZERO;
@@ -185,6 +191,8 @@ for(std::string id : psk_identities_)
 }
 //inceremnet size of extention
 size_of_extention = size_of_extention + extension_type_pre_shared_key.data.size() + 6;
+std::vector<uint8_t> vector_handshake_payload_client_hello(size_of_client_hello_message+ size_of_extention+5);
+size_of_hash = size_of_extention + 35;
 
 handshake_payload_client_hello_msg.extensions.push_back(extension_type_share_key);
 
@@ -195,6 +203,134 @@ handshake_payload_client_hello_msg.extensions.push_back(extension_types_psk_key)
 handshake_payload_client_hello_msg.extensions.push_back(extension_types_group);
 
 handshake_payload_client_hello_msg.extensions.push_back(extension_type_pre_shared_key);
+
+
+std::memcpy(&vector_handshake_payload_client_hello[ZERO], 
+            &handshake_payload_client_hello_msg.legacy_version,TWO);
+std::memcpy(&vector_handshake_payload_client_hello[TWO], 
+            &handshake_payload_client_hello_msg.random.random_bytes, 32);
+std::memcpy(&vector_handshake_payload_client_hello[34], 
+            &handshake_payload_client_hello_msg.legacy_session_id[ZERO], ONE);
+
+vector_handshake_payload_client_hello[35] = (uint8_t)(FOUR >> EIGHT);
+vector_handshake_payload_client_hello[35] &= HEX_FF;
+vector_handshake_payload_client_hello[36] = (uint8_t)(FOUR & HEX_FF);
+
+std::memcpy(&vector_handshake_payload_client_hello[37], 
+            &handshake_payload_client_hello_msg.cipher_suites[ZERO], FOUR);
+std::memcpy(&vector_handshake_payload_client_hello[41], 
+            &handshake_payload_client_hello_msg.legacy_compression_methods[ZERO], ONE);
+ 
+
+vector_handshake_payload_client_hello[42] = (uint8_t) (size_of_hash >> SIXTEEN);
+vector_handshake_payload_client_hello[42] &= HEX_FF;
+vector_handshake_payload_client_hello[43] = (uint8_t) (size_of_hash >> EIGHT);
+vector_handshake_payload_client_hello[43] &= HEX_FF;
+vector_handshake_payload_client_hello[44] = (uint8_t) (size_of_hash & HEX_FF);
+
+
+size_t index_client_msg = 0; 
+size_t size_of_client_extension = handshake_payload_client_hello_msg.extensions.size();
+uint16_t size_of_pre_key;
+uint16_t size_temp;
+uint16_t size_of_temp;
+uint16_t size_temp_; 
+while(index_client_msg < size_of_client_extension)
+{
+  Extension temp_extension;
+  temp_extension = handshake_payload_client_hello_msg.extensions[index_client_msg];    
+  //TODO: STart
+  vector_handshake_payload_client_hello[index_for_payload_handshake] = (temp_extension.type >> (ONE * EIGHT)); 
+  
+  vector_handshake_payload_client_hello[index_for_payload_handshake] &= HEX_FF;
+  
+  vector_handshake_payload_client_hello[index_for_payload_handshake + ONE] = (temp_extension.type >> (ZERO * EIGHT));
+  
+  vector_handshake_payload_client_hello[index_for_payload_handshake + ONE] &= HEX_FF;
+
+  if(index_client_msg == ZERO || index_client_msg == TWO)
+  {
+    size_temp_ = (uint16_t) temp_extension.data.size() + ONE;
+   
+    vector_handshake_payload_client_hello[index_for_payload_handshake + TWO] = (size_temp_ >> (ONE * EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + TWO] &= HEX_FF;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 3] = (size_temp_ >> (ZERO * EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 3] &= HEX_FF;
+
+    if(index_client_msg == ONE)
+    {
+      vector_handshake_payload_client_hello[index_for_payload_handshake + 4] = TWO;
+
+    }
+      
+    else if(index_client_msg == TWO)
+    {
+      vector_handshake_payload_client_hello[index_for_payload_handshake + 4] = ONE;
+    }
+      
+    index_for_payload_handshake = index_for_payload_handshake + 5;
+  }
+  else if(index_client_msg == 3)
+  {
+    size_of_temp = 4;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 2] = (size_of_temp >> (ONE * EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 2] &= HEX_FF;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 3] = (size_of_temp >> (ZERO * EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 3] &= HEX_FF;
+    
+    size_of_temp = size_of_temp - TWO;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 4] = (size_of_temp >> (ONE * EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 4] &= HEX_FF;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 5] = (size_of_temp >> (ZERO * EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 5] &= HEX_FF;
+    index_for_payload_handshake = index_for_payload_handshake + 6;
+  }
+  else if(index_client_msg == ZERO)
+  {
+    size_temp = vector_ecdh.size() + 6;
+    vector_handshake_payload_client_hello[index_for_payload_handshake + TWO] = (size_temp >> (ONE * EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + TWO] &= HEX_FF;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 3] = (size_temp >> (ZERO * EIGHT)); 
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 3] &= HEX_FF;
+    size_temp = size_temp - TWO;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 4] = (size_temp >> (ONE * EIGHT)); 
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 4] &= HEX_FF;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 5] = (size_temp >> (ZERO *EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 5] &= HEX_FF;
+    index_for_payload_handshake = index_for_payload_handshake + 6;
+  }
+  else if(index_client_msg == 4)
+  {
+    size_of_pre_key = extension_type_pre_shared_key.data.size() + 3 + TWO + 32;
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 2] = (size_of_pre_key >> (ONE * EIGHT));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 2] &= HEX_FF;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 3] = (size_of_pre_key >> (0 * 8));
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 3] &= HEX_FF;
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 4] = (extension_type_pre_shared_key.data.size() >> (1 * 8)); 
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 4] &= HEX_FF;
+    
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 5] = (extension_type_pre_shared_key.data.size() >> (0 * 8));
+    vector_handshake_payload_client_hello[index_for_payload_handshake + 5] &= HEX_FF;
+    index_for_payload_handshake = index_for_payload_handshake + 6;
+  }
+  
+  std::memcpy(&vector_handshake_payload_client_hello[index_for_payload_handshake], 
+              &temp_extension.data[0], 
+              temp_extension.data.size());
+
+  index_for_payload_handshake = index_for_payload_handshake + temp_extension.data.size();
+  index_client_msg++;
+}
 
 
 }
