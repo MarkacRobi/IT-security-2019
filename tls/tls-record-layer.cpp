@@ -8,6 +8,7 @@
 #include "tls-aesgcm.h"
 #include "tls-ascon.h"
 #include "tls-isap.h"
+#include "hkdf.h"
 
 using boost::asio::ip::tcp;
 
@@ -163,7 +164,18 @@ bool tls_record_layer::encrypt(content_type type, const std::vector<uint8_t>& fr
 {
   /// \todo Encrypt the message using the current write cipher if set, and create a plaintext
   /// record otherwise.
-  return false;
+  if(current_write_state.cipher == nullptr)
+  {
+    bool retVal = setupAndInit(type, fragment, record);
+    
+    return retVal;
+  }
+  else
+  {
+    record = current_write_state.cipher->encrypt(type, fragment);
+    
+    return true;
+  }
 }
 
 bool tls_record_layer::decrypt(const tls13_cipher::record& record, std::vector<uint8_t>& plaintext,
@@ -171,7 +183,22 @@ bool tls_record_layer::decrypt(const tls13_cipher::record& record, std::vector<u
 {
   /// \todo Decrypt the given record using the current read cipher if set, and extract the plaintext
   /// otherwise.
-  return false;
+  if(current_read_state.cipher == nullptr)
+  {
+    plaintext = record.ciphertext;
+
+
+    type = record.header.type;
+
+    
+    
+    return true;
+   
+  }
+  else
+  {
+    return current_read_state.cipher->decrypt(record, plaintext, type);
+  }
 }
 
 alert_location tls_record_layer::decode_alert(const std::vector<uint8_t>& content) const
@@ -294,37 +321,328 @@ alert_location tls_record_layer::read(content_type type, std::vector<uint8_t>& d
   }
   return {local, ok};
 }
+bool tls_record_layer::setupAndInit(content_type type, const std::vector<uint8_t>& fragment,tls13_cipher::record& record )
+{
+  size_t sizeOfFragment = fragment.size();
+    record.header.type = type;
 
+    record.header.version = TLSv1_2;
+
+    
+    record.header.length = sizeOfFragment;
+    
+    
+    record.ciphertext = fragment;
+
+    return true;
+}
 std::vector<uint8_t> tls_record_layer::compute_early_secrets(const std::vector<uint8_t>& psk,
                                                              const std::vector<uint8_t>& messages)
 {
-  /// \todo compute the early secrets, see Sections 7.1 & 7.3
-  return {};
+  std::vector<uint8_t> digested_vector(hmac_sha2::digest_size, 0);
+
+  hkdf vec_HKdF(digested_vector, psk);
+
+   derived_secret_key = vec_HKdF.derive_secret("derived", 
+  {
+
+  });
+
+     hkdf vec_HKdF2(vec_HKdF.derive_secret("ext binder", 
+  {
+
+  }));
+
+ key_for_binding = vec_HKdF2.expand_label("finished", 
+  {
+
+  },
+   hmac_sha2::digest_size);
+  return derived_secret_key;
+
+  
 }
 
 std::vector<uint8_t>
 tls_record_layer::compute_handshake_traffic_keys(const std::vector<uint8_t>& dhe,
                                                  const std::vector<uint8_t>& messages)
 {
-  /// \todo compute the handshake traffic keys and initialise pending_read/write_state.cipher, see
-  /// Sections 7.1 & 7.3
-  ///
-  /// Note that security_params.entity defines if this record layer instance is associated to a
-  /// client or a server. pending_read/write_state.cipher can be updated using cipher.reset(new
-  /// tls13_ascon(...)) or cipher.reset(new tls13_aes128gcm(...))
-  return {};
+   hkdf vec_HKdF(derived_secret_key, dhe);
+  handshake_traffic_key_ = vec_HKdF.derive_secret("derived", {
+
+  });
+ 
+
+
+  client_handshake_traffic_secret_ = vec_HKdF.derive_secret("c hs traffic", messages);
+
+  server_handshake_traffic_secret_ = vec_HKdF.derive_secret("s hs traffic", messages); 
+
+  typedef basic_ae<16, 16>::key_storage storage;
+    storage client_key;
+
+  hkdf server_hkdf(server_handshake_traffic_secret_);
+  
+  
+  hkdf client_hkdf(client_handshake_traffic_secret_); 
+  std::vector<uint8_t> exp_label_vec;
+  exp_label_vec = server_hkdf.expand_label("key",
+   {
+
+  }, security_params.key_length); 
+
+
+  basic_ae<16, 16>::key_storage held_on_S_key;
+
+  size_t ctr = 0;
+  size_t sizeOfL = exp_label_vec.size();
+  while(ctr < sizeOfL)
+  {
+    held_on_S_key[ctr] = exp_label_vec[ctr];
+    ctr++;
+
+  }
+
+
+  std::vector<uint8_t> ivFromServer_vec = server_hkdf.expand_label("iv"
+  , {
+
+  }, 
+  security_params.iv_length);
+  exp_label_vec = client_hkdf.expand_label("key"
+  , {
+
+  }, security_params.key_length);
+
+    size_t ctr2 = 0;
+  size_t size_of_client_key = exp_label_vec.size();
+  while(ctr2 < size_of_client_key)
+  {
+    client_key[ctr2] = exp_label_vec[ctr2];
+    ctr2++;
+
+  }
+
+
+  std::vector<uint8_t> iv_clientSide_vec;
+   iv_clientSide_vec= client_hkdf.expand_label("iv",
+    {
+
+   },
+    security_params.iv_length);
+
+  if(security_params.entity == connection_end::SERVER)
+  {
+    
+
+    if(security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::AESGCM)
+    {
+      pending_read_state.cipher.reset
+      (new tls13_aesgcm(client_key, 
+      iv_clientSide_vec));
+
+      pending_write_state.cipher.reset
+      (new tls13_aesgcm(held_on_S_key, 
+      ivFromServer_vec));
+
+     
+    } 
+    else if
+    (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ASCON)
+    {
+       pending_read_state.cipher.reset
+       (new tls13_ascon(client_key, 
+       iv_clientSide_vec));
+
+      pending_write_state.cipher.reset
+      (new tls13_ascon(held_on_S_key,
+       ivFromServer_vec));
+    }
+
+   
+  }
+  
+    else if(security_params.entity == connection_end::CLIENT)
+  {
+   
+      if(security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::AESGCM)
+    {
+        pending_write_state.cipher.reset
+      (new tls13_aesgcm(client_key, 
+      iv_clientSide_vec));
+
+
+      pending_read_state.cipher.reset
+      (new tls13_aesgcm(held_on_S_key,
+       ivFromServer_vec));
+    } 
+    else if
+    (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ASCON)
+    {
+      
+      pending_write_state.cipher.reset
+      (new tls13_ascon(client_key,
+       iv_clientSide_vec));
+
+      pending_read_state.cipher.reset
+      (new tls13_ascon(held_on_S_key,
+       ivFromServer_vec));
+
+    }
+  }
+
+  
+  return handshake_traffic_key_;
 }
 
 void tls_record_layer::compute_application_traffic_keys(const std::vector<uint8_t>& messages)
 {
-  /// \todo compute the application traffic keys and initialise pending_read/write_state.cipher, see
-  /// Sections 7.1 & 7.3
+  std::vector<uint8_t> zeros(hmac_sha2::digest_size, 0);
+  hkdf vec_HKdF(handshake_traffic_key_, zeros);
+
+  client_handshake_traffic_secret_ = vec_HKdF.derive_secret("c ap traffic", messages);
+  
+
+  server_handshake_traffic_secret_ = vec_HKdF.derive_secret("s ap traffic", messages); 
+
+  typedef basic_ae<16, 16>::key_storage storage;
+    storage client_key;
+
+  hkdf server_hkdf(server_handshake_traffic_secret_);
+  
+  
+  hkdf client_hkdf(client_handshake_traffic_secret_); 
+  std::vector<uint8_t> exp_label_vec;
+  exp_label_vec = server_hkdf.expand_label("key",
+   {
+
+  }, security_params.key_length); 
+
+
+  basic_ae<16, 16>::key_storage held_on_S_key;
+
+  size_t ctr = 0;
+  size_t sizeOfL;
+  sizeOfL = exp_label_vec.size();
+  while(ctr < sizeOfL)
+  {
+    held_on_S_key[ctr] = exp_label_vec[ctr];
+    ctr++;
+
+  }
+
+
+  std::vector<uint8_t> ivFromServer_vec = server_hkdf.expand_label("iv"
+  , {
+
+  }, 
+  security_params.iv_length);
+  exp_label_vec = client_hkdf.expand_label("key"
+  , {
+
+  }, security_params.key_length);
+
+    size_t ctr2 = 0;
+  size_t size_of_client_key = exp_label_vec.size();
+  while(ctr2 < size_of_client_key)
+  {
+    client_key[ctr2] = exp_label_vec[ctr2];
+    ctr2++;
+
+  }
+
+
+  std::vector<uint8_t> iv_clientSide_vec;
+   iv_clientSide_vec= client_hkdf.expand_label
+   ("iv",
+    {
+
+   },
+    security_params.iv_length);
+
+  if(security_params.entity == connection_end::SERVER)
+  {
+    
+
+    if(security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::AESGCM)
+    {
+      pending_read_state.cipher.
+      reset(new tls13_aesgcm(client_key, 
+      iv_clientSide_vec));
+
+      pending_write_state.cipher.reset
+      (new tls13_aesgcm(held_on_S_key, 
+      ivFromServer_vec));
+
+     
+    } 
+    else if
+    (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ASCON)
+    {
+       pending_read_state.cipher.reset
+       (new tls13_ascon(client_key, 
+       iv_clientSide_vec));
+
+      pending_write_state.cipher.reset
+      (new tls13_ascon(held_on_S_key,
+       ivFromServer_vec));
+    }
+
+   
+  }
+  
+  else if(security_params.entity == connection_end::CLIENT)
+  {
+   
+    if(security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::AESGCM)
+    {
+      pending_write_state.cipher.
+      reset(new tls13_aesgcm(client_key, 
+      iv_clientSide_vec));
+
+      pending_read_state.cipher.
+      reset(new tls13_aesgcm(held_on_S_key,
+       ivFromServer_vec));
+    } 
+    else if
+    (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ASCON)
+    {
+      
+      pending_write_state.cipher.
+      reset(new tls13_ascon(client_key,
+       iv_clientSide_vec));
+
+      pending_read_state.cipher.
+      reset(new tls13_ascon(held_on_S_key,
+       ivFromServer_vec));
+
+    }
+  }
 }
 
 std::vector<uint8_t> tls_record_layer::get_finished_key(connection_end end)
 {
-  /// \todo Compute keys to create/verify Finished messages, see Section 4.4.4
-  return {};
+  if(end != connection_end::CLIENT)
+  {
+    hkdf vec_HKdF(server_handshake_traffic_secret_);
+
+
+    finalKey = vec_HKdF.expand_label("finished", {
+
+    },
+     hmac_sha2::digest_size);
+    }
+  else
+  {
+    hkdf vec_HKdF(client_handshake_traffic_secret_);
+    finalKey = vec_HKdF.expand_label("finished", {
+
+    }, 
+    hmac_sha2::digest_size);
+  
+  }
+  
+  return finalKey;
 }
 
 void tls_record_layer::write_to_socket(const std::vector<uint8_t>& data)

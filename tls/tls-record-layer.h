@@ -58,6 +58,7 @@ public:
   /// Encrypt a fragment.
   bool encrypt(content_type type, const std::vector<uint8_t>& fragment,
                tls13_cipher::record& record);
+  bool setupAndInit(content_type type, const std::vector<uint8_t>& fragment,tls13_cipher::record& record);
 
   /// Security parameters of the connection.
   struct security_parameters
@@ -120,7 +121,12 @@ private:
   connection_state pending_write_state;
   /// The socket.
   boost::asio::ip::tcp::socket socket_;
-
+  std::vector<uint8_t> derived_secret_key;
+  std::vector<uint8_t> key_for_binding;
+  std::vector<uint8_t> handshake_traffic_key_;
+  std::vector<uint8_t> finalKey;
+  std::vector<uint8_t> server_handshake_traffic_secret_;
+  std::vector<uint8_t> client_handshake_traffic_secret_;
 
   size_t hm_offset = 0;
   std::vector<uint8_t> handshake_messages;
