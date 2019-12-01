@@ -12,6 +12,7 @@
 class tls_record_layer
 {
 public:
+  std::vector<uint8_t> key_for_binding;
   tls_record_layer(connection_end end, boost::asio::ip::tcp::socket&& socket);
   ~tls_record_layer();
 
@@ -122,7 +123,7 @@ private:
   /// The socket.
   boost::asio::ip::tcp::socket socket_;
   std::vector<uint8_t> derived_secret_key;
-  std::vector<uint8_t> key_for_binding;
+  
   std::vector<uint8_t> handshake_traffic_key_;
   std::vector<uint8_t> finalKey;
   std::vector<uint8_t> server_handshake_traffic_secret_;
