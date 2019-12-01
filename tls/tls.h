@@ -104,7 +104,8 @@ struct cipher_suite
 } __attribute__((packed));
 
 constexpr cipher_suite TLS_AES_128_GCM_SHA256 = {0x13, 0x01};
-constexpr cipher_suite TLS_ASCON_128_SHA256   = {0xFF, 0x01};
+constexpr cipher_suite TLS_ASCON_128_SHA256   = {0xFE, 0x01};
+constexpr cipher_suite TLS_ISAP_128_SHA256   = {0xFF, 0x01};
 typedef std::vector<cipher_suite> cipher_suites;
 
 enum AlertLevel : uint8_t
@@ -213,7 +214,7 @@ struct HandshakePayload
   std::vector<uint8_t> legacy_session_id;
   std::vector<cipher_suite> cipher_suites;
   std::vector<uint8_t> legacy_compression_methods;
-  std::vector<Extension> extentions;
+  std::vector<Extension> extensions;
 };
 
 struct HandshakePackage

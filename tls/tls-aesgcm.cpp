@@ -1,6 +1,5 @@
-    #include "tls-aesgcm.h"
+#include "tls-aesgcm.h"
 #include "endian.h"
-
 #include "aes128gcm.h"
 #include <iostream>
 
@@ -19,7 +18,7 @@ tls13_aesgcm::tls13_aesgcm(const key_storage& key, const std::vector<uint8_t>& n
 
 tls13_aesgcm::~tls13_aesgcm() {}
 
-std::vector<uint8_t> tls13_aesgcm::initializeData(record record_, 
+std::vector<uint8_t> tls13_aesgcm::initializeData(record record_,
                                   std::vector<uint8_t> &plaintext_,
                                   content_type type)
 {
@@ -61,7 +60,7 @@ record_.header.type = TLS_APPLICATION_DATA;
     {
       /////
     }
-    
+
 }
 
 bool tls13_aesgcm::decrypt(const record& record, std::vector<uint8_t>& plaintext,
@@ -75,12 +74,12 @@ bool tls13_aesgcm::decrypt(const record& record, std::vector<uint8_t>& plaintext
   data.push_back(record.header.type);
   data.push_back(record.header.version.major);
   data.push_back(record.header.version.minor);
-  
+
   data.push_back(record.header.length >> SUBT);
   data.push_back(record.header.length & ADDER);
-  
+
   bool decrypt = aes_.decrypt(plaintext, record.ciphertext, nonce_.nonce(), data);
-  
+
   if(decrypt == false)
   {
     return decrypt;
@@ -88,7 +87,7 @@ bool tls13_aesgcm::decrypt(const record& record, std::vector<uint8_t>& plaintext
 
   type = (content_type) plaintext.back();
   plaintext.pop_back();
- 
+
   nonce_.operator ++();
   return decrypt;
 
