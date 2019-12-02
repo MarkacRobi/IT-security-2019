@@ -45,6 +45,18 @@ public:
     std::vector<uint8_t> clientHeader;
     void setClientHeader(std::vector<uint8_t> clientHeader_);
     std::vector<uint8_t> serverMessagesVector;
+    uint16_t  ident_selected = 0;
+
+    size_t  serverHelloMessageSize = 0;
+    void setSereverHelloMessageSize(size_t size);
+
+    size_t  extensionSize = 0;
+    void setExtenesionSize(size_t size);
+
+
+    std::vector<uint8_t > vectorForSending();
+
+    size_t getLengthForClientHash(handshake_message_header handshakeMessageHeader);
 
 private:
   alert_location read_client_hello();

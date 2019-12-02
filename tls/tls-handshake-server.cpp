@@ -1,6 +1,11 @@
 #include "tls-handshake-server.h"
+#include "random.h"
+#include "hmac-sha2.h"
+
 #define THREE 3
 #define EIGHT 8
+#define SERVER_LEGACY 0x0303;
+#define SHIFT_NUMBER 0xFF;
 
 tls_handshake_server::tls_handshake_server(tls_record_layer& layer, const psk_map& psks)
   : layer_(layer), psks_(psks), ecdh_(SECP256R1), fixed_randomness_({{0}}),
@@ -206,7 +211,7 @@ alert_location tls_handshake_server::read_client_hello()
 
   setCurrentPosition(currentPosition + 2);
 
-  size_t  id_selected = getSizeOfIdentites(clientPayload, 0);//TODO probaj bez ovoga samo obrisi i dole stavi = 0, jer ne koristi ga nikako do dole
+  size_t  bidners_selected = getSizeOfIdentites(clientPayload, 0);//TODO treba li ovo uopste jer se nigdje ne koristi
 
   setCurrentPosition(currentPosition + 2);
   std::vector<std::string> identities_vector;
@@ -228,12 +233,11 @@ alert_location tls_handshake_server::read_client_hello()
       identities_vector.push_back(id);
       i = id_size + i + 4;
   }
-  id_selected = 0;//TODO probaj moze li samo 0 umjesto njega
 
   uint16_t size_of_bidner_param1 = clientPayload[currentPosition + sizeOfIdentities + 2] >> 8;
   size_of_bidner_param1 = size_of_bidner_param1 & 0xFF;
 
-  uint16_t size_of_bidner_param2 = clientPayload[currentPosition + sizeOfIdentities + 3] >> 8;
+  uint16_t size_of_bidner_param2 = clientPayload[currentPosition + sizeOfIdentities + 3];
   size_of_bidner_param2 = size_of_bidner_param2 & 0xFF;
   size_t size_of_bidner = (uint16_t)(size_of_bidner_param1) +  (uint16_t)(size_of_bidner_param2);
 
@@ -241,10 +245,10 @@ alert_location tls_handshake_server::read_client_hello()
   bidners_vector.resize(size_of_bidner);//TODO provjeri jel moze
   std::memcpy(&bidners_vector[0], &clientPayload[4 + sizeOfIdentities + currentPosition], size_of_bidner);
 
-  if(psks_.end() ==  psks_.find(identities_vector.at(id_selected)))
+  if(psks_.end() ==  psks_.find(identities_vector.at(ident_selected)))
     return {local, internal_error};
 
-  std::vector<uint8_t> psk_find = psks_.find(identities_vector.at(id_selected))->second;
+  std::vector<uint8_t> psk_find = psks_.find(identities_vector.at(ident_selected))->second;//TODO moze li nula ovdje se koristiti
   layer_.compute_early_secrets(psk_find, {});
 
   selected_cipher_suite = cipher_suites_vector.at(0);
@@ -258,23 +262,243 @@ alert_location tls_handshake_server::read_client_hello()
   return {local, ok};
 }
 
+void tls_handshake_server::setSereverHelloMessageSize(size_t size)
+{
+    serverHelloMessageSize = serverHelloMessageSize + size;
+}
+
+void tls_handshake_server::setExtenesionSize(size_t size)
+{
+    extensionSize = extensionSize + size;
+}
+
 void tls_handshake_server::send_server_hello()
 {
 /// \todo write the ServerHello message to the record layer
 /// If have_fixed_randomness_ is false, generate random data.
 /// If it is true, use fixed_randomness_ as random data.
+    size_t position = 20 + 20;
+    extensionSize = 0;
+    serverHelloMessageSize = 0;
 
+    handshake_message_header handshakeMessageHeader;
+    handshakeMessageHeader.msg_type = handshake_types::SERVER_HELLO;
+    HandshakePayload serverHelloMessage;
+    serverHelloMessage.legacy_version = SERVER_LEGACY;
+
+    setSereverHelloMessageSize(1);
+    setSereverHelloMessageSize(1);
+
+    if(!have_fixed_randomness_)
+    {
+
+
+        get_random_data(reinterpret_cast<uint8_t *>(serverHelloMessage.random.random_bytes), num_32);
+    }
+    else{
+        std::memcpy(&serverHelloMessage.random.random_bytes, &fixed_randomness_, num_32);
+
+
+    }
+    setSereverHelloMessageSize(num_32);
+    serverHelloMessage.legacy_compression_methods.push_back(0);
+    serverHelloMessage.legacy_session_id.push_back(0);
+
+    serverHelloMessage.cipher_suites.push_back(selected_cipher_suite);
+    setSereverHelloMessageSize(2);
+    setSereverHelloMessageSize(2);
+
+    Extension versionSupported;
+
+    versionSupported.data.push_back(TLSv1_3_MAJOR);//TODO Check redoslijed
+    versionSupported.data.push_back(TLSv1_3_MINOR);
+    versionSupported.type = ExtensionType::SUPPORTED_VERSIONS;
+
+    setExtenesionSize(3);
+    setExtenesionSize(3);
+
+    Extension sharedKey;
+    KeyShareEntry keyShareEntry;
+    std::vector<uint8_t > data_for_ecdh = ecdh_.get_data();
+
+    keyShareEntry.group = NamedGroup::SECP_256_R1;
+    sharedKey.type = ExtensionType::KEY_SHARE;
+
+    sharedKey.data.resize(ecdh_.get_data().size() + 2 + 2);//TODO check
+    sharedKey.data[3] = (ecdh_.get_data().size()  >> 0 & 0xFF);
+    sharedKey.data[2] = (ecdh_.get_data().size()  >> 8 & 0xFF);
+    NamedGroup sharedKeyShiftValue = keyShareEntry.group;
+    sharedKey.data[1] = (sharedKeyShiftValue  >> 0 & 0xFF);
+    sharedKey.data[0] = (sharedKeyShiftValue  >> 8 & 0xFF);
+
+    memcpy(&sharedKey.data[2+2], &data_for_ecdh[0], ecdh_.get_data().size());
+    setExtenesionSize(sharedKey.data.size() + 3 + 1);
+
+    Extension sharedKeyPre;
+    sharedKeyPre.data.push_back((ident_selected >> 8) & 0xFF);
+    sharedKeyPre.data.push_back(ident_selected & 0xFF);
+
+    sharedKeyPre.type = ExtensionType::PRE_SHARED_KEY;
+
+    setExtenesionSize(sharedKey.data.size() + 3 + 1);
+
+    serverHelloMessage.extensions.push_back(sharedKey);
+
+
+    serverHelloMessage.extensions.push_back(versionSupported);
+    serverHelloMessage.extensions.push_back(sharedKeyPre);
+
+    std::vector<uint8_t >handshakePayload;
+    handshakePayload.resize(2 + extensionSize + serverHelloMessageSize);//TODO da li moze resize ovdje
+
+    std::memcpy(&handshakePayload[0], &serverHelloMessage.legacy_version,2);
+    std::memcpy(&handshakePayload[37], &serverHelloMessage.legacy_compression_methods[0],2 - 1);
+
+    std::memcpy(&handshakePayload[35], &serverHelloMessage.cipher_suites[0],2);
+    std::memcpy(&handshakePayload[34], &serverHelloMessage.legacy_session_id[0],1);
+
+    std::memcpy(&handshakePayload[2], &serverHelloMessage.random.random_bytes,32);
+
+    handshakePayload[39] = (uint8_t)(extensionSize & 0xFF);
+    handshakePayload[38] = (uint8_t)((extensionSize >> EIGHT * 1) & 0xFF);
+
+    size_t i = 0;
+
+    while(i < serverHelloMessage.extensions.size())
+    {
+        handshakePayload[position] = ((serverHelloMessage.extensions[i].type >> EIGHT) & 0xFF);
+        handshakePayload[position + 1] = ((serverHelloMessage.extensions[i].type >> EIGHT) & 0xFF);
+
+        if(i == 0)
+        {
+            handshakePayload[position + 2] = (uint16_t)(((data_for_ecdh.size() + 4) >> EIGHT) & 0xFF);
+            handshakePayload[position + 3] = (uint16_t)(((data_for_ecdh.size() + 4) >> 0) & 0xFF);//TODO CHECK
+            position = position + 4;
+        }
+        else if(i == 1)
+        {
+            handshakePayload[position + 2] = (uint16_t)(((serverHelloMessage.extensions[i].data.size()) >> EIGHT) & 0xFF);
+            handshakePayload[position + 3] = (uint16_t)(((serverHelloMessage.extensions[i].data.size()) >> 0) & 0xFF);
+            position = position + 4;
+        }
+        else if(i == 2)
+        {
+            handshakePayload[position + 2] = (uint16_t)(((sharedKeyPre.data.size()) >> EIGHT) & 0xFF);
+            handshakePayload[position + 3] = (uint16_t)(((sharedKeyPre.data.size()) >> 0) & 0xFF);
+            position = position + 4;
+        }
+        std::memcpy(&handshakePayload[position], &serverHelloMessage.extensions[i].data[0], serverHelloMessage.extensions[i].data.size());
+        position = serverHelloMessage.extensions[i].data.size() + position;
+        i++;
+    }
+
+
+    handshakeMessageHeader.length[2] = ((handshakePayload.size() >> 0) & 0xFF);
+    handshakeMessageHeader.length[1] = ((handshakePayload.size() >> 8) & 0xFF);
+    handshakeMessageHeader.length[0] = ((handshakePayload.size() >> 16) & 0xFF);
+
+    size_t size_ = sizeof(handshakeMessageHeader);
+    std::vector<uint8_t>data_for_client(size_ + handshakePayload.size());//TODO check
+
+    memcpy(&data_for_client[0], &handshakeMessageHeader, size_);
+    memcpy(&data_for_client[sizeof(handshakeMessageHeader)], &handshakePayload[0], handshakePayload.size());
+
+    layer_.write(TLS_HANDSHAKE, data_for_client);
+    serverMessagesVector.insert(serverMessagesVector.end(), data_for_client.begin(), data_for_client.end());
+}
+
+std::vector<uint8_t > tls_handshake_server::vectorForSending()
+{
+    handshake_message_header handshakeMessageHeader;
+    handshakeMessageHeader.length[2] = hmac_sha2::digest_size;
+    handshakeMessageHeader.length[1] = 0;
+    handshakeMessageHeader.length[0] = 0;
+    handshakeMessageHeader.msg_type = handshake_types ::FINISHED;
+
+    std::vector<uint8_t > vector_for_sending;
+    vector_for_sending.push_back((handshakeMessageHeader.msg_type));
+    vector_for_sending.push_back((handshakeMessageHeader.length[0]));
+    vector_for_sending.push_back((handshakeMessageHeader.length[1]));
+    vector_for_sending.push_back((handshakeMessageHeader.length[2]));
+
+    return vector_for_sending;
 }
 
 void tls_handshake_server::send_finished()
 {
 /// \todo write the Finished message to the record layer
+    layer_.update_read_key();
+    layer_.update_write_key();
+    layer_.compute_handshake_traffic_keys(ecdh_.get_shared_secret(keyForClient), serverMessagesVector);
+    layer_.set_cipher_suite(selected_cipher_suite);
+
+    std::vector<uint8_t > vector_for_sending = vectorForSending();
+
+    sha2 hash_client;
+
+    hash_client.update(&serverMessagesVector[0], serverMessagesVector.size());
+
+
+    std::vector<uint8_t> keyFinished = layer_.get_finished_key(connection_end::SERVER);
+    hmac_sha2 HMAC_SHA2(&keyFinished[0], keyFinished.size());
+    HMAC_SHA2.update(hash_client.digest().data(), hash_client.digest().size());
+
+    for(size_t i = 0; i < HMAC_SHA2.digest().size(); i++)
+    {
+        vector_for_sending.push_back(HMAC_SHA2.digest()[i]);//TODO check
+    }
+
+    serverMessagesVector.insert(serverMessagesVector.end(), vector_for_sending.begin(), vector_for_sending.end());
+}
+
+size_t tls_handshake_server::getLengthForClientHash(handshake_message_header handshakeMessageHeader)
+{
+    return (size_t)(handshakeMessageHeader.length[2] + (handshakeMessageHeader.length[1] << EIGHT) + (handshakeMessageHeader.length[0] << EIGHT * 2));
 }
 
 alert_location tls_handshake_server::read_finished()
 {
   /// \todo read the Finished message from the record layer and handle it
-  return {local, internal_error};
+
+  std::vector<uint8_t> finished_message_fromClient;
+  setCurrentAlert(layer_.read(TLS_HANDSHAKE, finished_message_fromClient, 2 + 2 + hmac_sha2::digest_size));
+  checkError();
+
+  handshake_message_header handshakeMessageHeader;
+  handshakeMessageHeader.length[2] = finished_message_fromClient[3];
+  handshakeMessageHeader.length[1] = finished_message_fromClient[2];
+  handshakeMessageHeader.length[0] = finished_message_fromClient[1];
+
+  handshakeMessageHeader.msg_type = handshake_types (finished_message_fromClient[0]);
+  if(handshake_types::FINISHED != handshakeMessageHeader.msg_type)
+  {
+
+      return {local, unexpected_message};
+  }
+
+  std::vector<uint8_t> hash_for_client(getLengthForClientHash(handshakeMessageHeader));//TODO provjeri jel treba resize
+  std::memcpy(&hash_for_client[0], &finished_message_fromClient[2 +2], getLengthForClientHash(handshakeMessageHeader));
+  sha2 hash_for_server;
+  hash_for_server.update(&serverMessagesVector[0], serverMessagesVector.size());
+
+  std::vector<uint8_t> keyFinishedVector = layer_.get_finished_key(connection_end::CLIENT);
+
+  hmac_sha2 hmacSha2(&keyFinishedVector[0], keyFinishedVector.size());
+  hmacSha2.update(hash_for_server.digest().data(), hash_for_server.digest().size());
+
+  std::vector<uint8_t> hash(hmacSha2.digest().size());//TODO check resize
+  std::memcpy(&hash[0], &hmacSha2.digest()[0], hmacSha2.digest().size());
+  if(hash != hash_for_client)
+  {
+
+      return {local, decrypt_error};
+  }
+  layer_.update_read_key();
+  layer_.update_write_key();
+  layer_.compute_application_traffic_keys(serverMessagesVector);
+
+  serverMessagesVector.insert(serverMessagesVector.end(), finished_message_fromClient.begin(), finished_message_fromClient.end());
+  return {local, ok};
 }
 
 alert_location tls_handshake_server::answer_handshake()
