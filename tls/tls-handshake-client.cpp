@@ -6,6 +6,7 @@
 #define LEGACY_STANDARD_VERSION 0x0303
 #define TWO 2
 #define ONE 1
+#define THREE 3 
 #define ZERO 0
 #define EIGHT 8
 #define NULA 0x00
@@ -396,15 +397,51 @@ layer_.write(TLS_HANDSHAKE, vector_data_handshake);
 vector_of_client_msg.insert(vector_of_client_msg.end(), vector_data_handshake.begin(), vector_data_handshake.end());
 
 }
+ size_t get_lengt(handshake_message_header handshake_message_from_header)
+{
+  size_t return_value; 
+  return_value = (size_t) (handshake_message_from_header.length[ZERO] << 16) + 
+        (size_t) (handshake_message_from_header.length[ONE] << EIGHT) + 
+        (size_t)handshake_message_from_header.length[TWO];
+  return return_value; 
+}
+uint16_t calculate_the_last(std::vector<uint8_t> vector_payload_server, size_t value)
+{
+  uint16_t return_value; 
+  return_value = (uint16_t) (vector_payload_server[value] << EIGHT) + (uint16_t) vector_payload_server[value + ONE];
+  return return_value; 
+}
+void tls_handshake_client::set_layer(cipher_suite cipher_suite_to_select, std::vector<uint8_t> vector_edch_data_share)
+{
+  layer_.set_cipher_suite(cipher_suite_to_select);
+  layer_.compute_handshake_traffic_keys(vector_edch_data_share, vector_of_client_msg);
+  layer_.update_read_key();
+  layer_.update_write_key();
+}
+  
 
 alert_location tls_handshake_client::read_server_hello()
 {
   /// \todo Read and handle ServerHello message
   handshake_message_header handshake_message_from_header; 
   size_t size_of_header_msg; 
-  std::vector<uint8_t> vector_server_header; 
+  size_t size_of_msg_len; 
+  std::vector<uint8_t> vector_server_header;
+  std::vector<uint8_t> vector_payload_server; 
+  std::vector<uint8_t> vector_data_for_handshake;
+  std::vector<uint8_t> vector_edch_data_share;
   alert_location alert_msg; 
+  HandshakePayload handshake_payload; 
+  cipher_suite cipher_suite_to_select; 
+  uint16_t size_of_key; 
+  size_t temp; 
+  uint16_t index_at_ide;
   
+  
+  Extension extension_key_share;
+  Extension extension_version_to_select;
+  Extension extension_shared_key_pre;
+  KeyShareEntry share_key_entry;
 
   size_of_header_msg = sizeof(handshake_message_from_header);
   //get allert msg from read
@@ -416,8 +453,171 @@ alert_location tls_handshake_client::read_server_hello()
     return alert_msg; 
   }
 
-  //return {local, internal_error};
+  //set header from server
+  handshake_message_from_header.msg_type = handshake_types(vector_server_header[0]);
+  for(int i = 0; i < 3; i++)
+  {
+    handshake_message_from_header.length[i] = vector_server_header[i + ONE];
+  }
+
+  //check the type of msg
+  if(handshake_message_from_header.msg_type != handshake_types::SERVER_HELLO)
+  {
+
+    return{local,unexpected_message};
+  }
+
+  size_of_msg_len = get_lengt(handshake_message_from_header);
+  //check alert for payload
+  alert_msg = layer_.read(TLS_HANDSHAKE, vector_payload_server, size_of_msg_len);
+  if(!alert_msg)
+  {
+
+    return alert_msg; 
+  }
+
+  if (vector_payload_server[ONE] != THREE || vector_payload_server[ZERO] != THREE)
+  {
+
+    return {local, protocol_version};
+  }
+  std::memcpy(&handshake_payload.random.random_bytes,
+              &vector_payload_server[TWO], 32);
+
+
+  handshake_payload.legacy_session_id.push_back(vector_payload_server[34]);
+  if (handshake_payload.legacy_session_id[ZERO] != ZERO)
+  {
+
+    return {local, illegal_parameter}; 
+  }
+
+  cipher_suite_to_select.type[ZERO] = vector_payload_server[35];
+  cipher_suite_to_select.type[ONE] = vector_payload_server[36];
+
+  //push cipher suite to handshake payload
+  handshake_payload.cipher_suites.push_back(cipher_suite_to_select);
+
+  //check the selected suite
+  if (cipher_suite_to_select != TLS_ASCON_128_SHA256)
+  {
+    if (cipher_suite_to_select != TLS_AES_128_GCM_SHA256)
+    {
+      return {local, handshake_failure}; 
+    }
+  }
+
+  //push to handshake payload
+  handshake_payload.legacy_compression_methods.push_back(vector_payload_server[37]);
+
+  if (handshake_payload.legacy_compression_methods[ZERO] != ZERO)
+  {
+
+      return {local, illegal_parameter};
+  }
+
+                                                            
+  extension_key_share.type = ExtensionType(calculate_the_last(vector_payload_server, 40));
+  if  (extension_key_share.type != ExtensionType::KEY_SHARE)
+  {
+
+    return {local, illegal_parameter};
+  }
+
+  share_key_entry.group = NamedGroup(calculate_the_last(vector_payload_server, 44));
+  if(NamedGroup::SECP_256_R1 != share_key_entry.group)
+  {
+
+    return {local, illegal_parameter}; 
+  }
+    
+
+  size_of_key = calculate_the_last(vector_payload_server, 46);
+  temp = size_of_key + 48; 
+
+  extension_key_share.data.resize(size_of_key);
+  memcpy(&extension_key_share.data[ZERO], 
+        &vector_payload_server[48], 
+        size_of_key);
+
+  //STart here 
+                                                  
+  extension_version_to_select.type = ExtensionType(calculate_the_last(vector_payload_server, temp));
+  if(ExtensionType::SUPPORTED_VERSIONS != extension_version_to_select.type )
+  {
+
+    return {local, illegal_parameter};
+  }
+
+
+  if(vector_payload_server[TWO + temp] != ZERO || vector_payload_server[THREE + temp] != TWO)
+  {
+
+    return {local, illegal_parameter};
+  }
+    
+
+
+  if(vector_payload_server[FOUR + temp] != TLSv1_3.major || vector_payload_server[5 + temp] != TLSv1_3.minor)
+  {
+
+    return {local, illegal_parameter};
+  }
+    
+
+  //incement the indey temp
+  temp = temp + 6;
+  
+  
+  extension_shared_key_pre.type = ExtensionType(calculate_the_last(vector_payload_server, temp));
+  index_at_ide = calculate_the_last(vector_payload_server, temp + FOUR);
+  if(ExtensionType::PRE_SHARED_KEY !=extension_shared_key_pre.type)
+  {
+
+    return {local, illegal_parameter};
+  }
+  
+
+  if(vector_payload_server[TWO + temp] != ZERO || vector_payload_server[THREE + temp] != 2)
+  {
+
+    return {local, illegal_parameter};
+  }
+    
+
+  temp = temp + 6;
+
+  if (psks_.find(psk_identities_[index_at_ide]) == psks_.end())
+  {
+
+    return {local, unknown_psk_identity};
+  }
+    
+  size_t size_of_payload = vector_payload_server.size();
+  size_t size_of_header_vector = vector_server_header.size();
+   
+  vector_data_for_handshake.resize(size_of_payload + size_of_header_vector);
+
+  memcpy(&vector_data_for_handshake[ZERO], 
+          &vector_server_header[ZERO], 
+          size_of_header_vector);
+
+  memcpy(&vector_data_for_handshake[size_of_header_vector], 
+         &vector_payload_server[ZERO], 
+         size_of_payload);
+
+  vector_of_client_msg.insert(vector_of_client_msg.end(), 
+                          vector_data_for_handshake.begin(), 
+                          vector_data_for_handshake.end());
+
+  vector_edch_data_share = ecdh_.get_shared_secret(extension_key_share.data);
+
+  set_layer(cipher_suite_to_select, vector_edch_data_share);
+  return {local, ok};
+   //return {local, internal_error};
 }
+ 
+
 
 alert_location tls_handshake_client::read_finished()
 {

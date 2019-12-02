@@ -33,7 +33,9 @@ private:
   /// All available identities.
   const psk_map psks_;
 
+  void set_layer(cipher_suite cipher_suite_to_select, std::vector<uint8_t> vector_edch_data_share);
   std::vector<uint8_t> vector_of_client_msg; 
+  
   /// ECDH instance.
   ecdh ecdh_;
   /// Fixed randomness if given.
