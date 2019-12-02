@@ -400,7 +400,23 @@ vector_of_client_msg.insert(vector_of_client_msg.end(), vector_data_handshake.be
 alert_location tls_handshake_client::read_server_hello()
 {
   /// \todo Read and handle ServerHello message
-  return {local, internal_error};
+  handshake_message_header handshake_message_from_header; 
+  size_t size_of_header_msg; 
+  std::vector<uint8_t> vector_server_header; 
+  alert_location alert_msg; 
+  
+
+  size_of_header_msg = sizeof(handshake_message_from_header);
+  //get allert msg from read
+  alert_msg = layer_.read(TLS_HANDSHAKE, vector_server_header, size_of_header_msg); 
+  //check if alert
+  if(!alert_msg)
+  {
+
+    return alert_msg; 
+  }
+
+  //return {local, internal_error};
 }
 
 alert_location tls_handshake_client::read_finished()
