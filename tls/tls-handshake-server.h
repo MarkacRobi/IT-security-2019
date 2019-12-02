@@ -25,13 +25,26 @@ public:
   //currentALert
   alert_location currentAlert;
   alert_location setCurrentAlert(alert_location currentAlert_);
-    alert_location checkError();
-    handshake_message_header returnClientHeader();
-    std::vector<uint8_t> getClientPayload(size_t payload_length_);
-    int num_32 = 32;
+  alert_location checkError();
+  handshake_message_header returnClientHeader();
+  std::vector<uint8_t> getClientPayload(size_t payload_length_);
+  int num_32 = 32;
 
-    Extension getKeyShare(std::vector<uint8_t> clientPayload);
-    KeyShareEntry getKeyShareEntry(std::vector<uint8_t> clientPayload);
+  Extension getKeyShare(std::vector<uint8_t> clientPayload);
+  KeyShareEntry getKeyShareEntry(std::vector<uint8_t> clientPayload);
+  std::vector<uint8_t> keyForClient;
+    std::vector<uint8_t> getKeyForClient();
+    void setKeyForClient(std::vector<uint8_t> keyForClient_);
+    void setKeyForClient(std::vector<uint8_t> clientPayload, uint16_t size_of_key);
+    size_t currentPosition = 0;
+    void setCurrentPosition(size_t size);
+    Extension getExtension(std::vector<uint8_t> clientPayload);
+    Extension setPskEx(std::vector<uint8_t> clientPayload);
+    size_t getSizeOfIdentites(std::vector<uint8_t> clientPayload, size_t iterator);
+    cipher_suite selected_cipher_suite;
+    std::vector<uint8_t> clientHeader;
+    void setClientHeader(std::vector<uint8_t> clientHeader_);
+    std::vector<uint8_t> serverMessagesVector;
 
 private:
   alert_location read_client_hello();
