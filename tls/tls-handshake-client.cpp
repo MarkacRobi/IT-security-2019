@@ -409,6 +409,7 @@ uint16_t calculate_the_last(std::vector<uint8_t> vector_payload_server, size_t v
 {
   uint16_t return_value; 
   return_value = (uint16_t) (vector_payload_server[value] << EIGHT) + (uint16_t) vector_payload_server[value + ONE];
+                  
   return return_value; 
 }
 void tls_handshake_client::set_layer(cipher_suite cipher_suite_to_select, std::vector<uint8_t> vector_edch_data_share)
@@ -622,7 +623,78 @@ alert_location tls_handshake_client::read_server_hello()
 alert_location tls_handshake_client::read_finished()
 {
   /// \todo Read and handle Finished message
-  return {local, internal_error};
+  //return {local, internal_error};
+  size_t size_of_header_msg;
+	sha2 sha2_hash_client;
+	handshake_message_header handshake_msg_header;
+	std::vector<uint8_t> vector_key_done;
+	std::vector<uint8_t> vector_hash_to_server;
+	std::vector<uint8_t> vector_server_msg;
+	std::vector<uint8_t> vector_client_hash;
+	
+	size_t size_of_msg_from_client;	
+  alert_location alert_msg;
+
+	
+	alert_msg = layer_.read(TLS_HANDSHAKE, vector_server_msg, hmac_sha2::digest_size + FOUR);
+
+    if(!alert_msg)
+	{
+		
+		return alert_msg;
+	}
+	
+
+
+	 handshake_msg_header.msg_type = handshake_types(vector_server_msg[ZERO]);
+	 for(int i = 0; i < 3; i++)
+	 {
+		handshake_msg_header.length[i] = vector_server_msg[i + ONE];
+	 }
+	  
+
+	  if ( handshake_types::FINISHED != handshake_msg_header.msg_type )
+	  {
+		  
+		return {local, unexpected_message};
+	  }
+	  
+		
+//provjeri moze li moja funkcija 
+  size_of_header_msg = get_lengt(handshake_msg_header);
+    
+  
+  vector_hash_to_server.resize(size_of_header_msg);
+  std::memcpy(&vector_hash_to_server[ZERO], &vector_server_msg[FOUR], size_of_header_msg);
+
+  size_of_msg_from_client = vector_of_client_msg.size();
+  sha2_hash_client.update(&vector_of_client_msg[ZERO], size_of_msg_from_client);
+  hmac_sha2::digest_storage dig = sha2_hash_client.digest();
+
+  vector_key_done  = layer_.get_finished_key(connection_end::SERVER);
+  //todo: check hmac
+  hmac_sha2 hmac(&vector_key_done[0], vector_key_done.size());  
+  hmac.update(dig.data(), dig.size());
+  
+  
+  sha2::digest_storage digest_store_hash = hmac.digest();
+  size_t size_hmac = digest_store_hash.size();
+	  
+	vector_client_hash.resize(digest_store_hash.size());
+	std::memcpy(&vector_client_hash[ZERO], &digest_store_hash[ZERO], size_hmac);
+
+	if(vector_client_hash != vector_hash_to_server)
+	{
+		
+		return {local, decrypt_error};
+	}
+		
+
+	vector_of_client_msg.insert(vector_of_client_msg.end(), 
+                              vector_server_msg.begin(), 
+                              vector_server_msg.end());
+
+	return {local, ok};
 }
 
 void tls_handshake_client::send_finished()
