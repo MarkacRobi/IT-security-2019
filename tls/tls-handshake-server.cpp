@@ -427,7 +427,7 @@ std::vector<uint8_t > tls_handshake_server::vectorForSending()
 void tls_handshake_server::send_finished()
 {
 /// \todo write the Finished message to the record layer
-    layer_.update_read_key();
+    /*layer_.update_read_key();
     layer_.update_write_key();
     layer_.compute_handshake_traffic_keys(ecdh_.get_shared_secret(keyForClient), serverMessagesVector);
     layer_.set_cipher_suite(selected_cipher_suite);
@@ -448,7 +448,38 @@ void tls_handshake_server::send_finished()
         vector_for_sending.push_back(HMAC_SHA2.digest()[i]);//TODO check
     }
 
-    serverMessagesVector.insert(serverMessagesVector.end(), vector_for_sending.begin(), vector_for_sending.end());
+    serverMessagesVector.insert(serverMessagesVector.end(), vector_for_sending.begin(), vector_for_sending.end());*/
+  layer_.set_cipher_suite(selected_cipher_suite);
+
+  layer_.compute_handshake_traffic_keys(ecdh_.get_shared_secret(keyForClient), serverMessagesVector);
+  
+  layer_.update_read_key();
+  
+  layer_.update_write_key();
+
+  std::vector<uint8_t> vector_for_sending = vectorForSending();
+
+
+  sha2 client_hash;
+  client_hash.update(&serverMessagesVector[0], serverMessagesVector.size());
+  
+
+  std::vector<uint8_t> keyFinished;
+  keyFinished = layer_.get_finished_key(connection_end::SERVER);
+  hmac_sha2 HMAC_SHA2(&keyFinished[0], keyFinished.size());  
+  hmac_sha2::digest_storage digest_storage = client_hash.digest();
+  HMAC_SHA2.update(digest_storage.data(), client_hash.digest().size());
+
+  auto hmac_digest = HMAC_SHA2.digest();
+
+  for (size_t i = 0; i < HMAC_SHA2.digest().size(); i++)
+  {
+    vector_for_sending.push_back(hmac_digest[i]);
+  }
+
+  layer_.write(TLS_HANDSHAKE, vector_for_sending);
+
+  serverMessagesVector.insert(serverMessagesVector.end(), vector_for_sending.begin(), vector_for_sending.end()); 
 }
 
 size_t tls_handshake_server::getLengthForClientHash(handshake_message_header handshakeMessageHeader)
