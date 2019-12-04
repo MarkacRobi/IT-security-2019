@@ -700,5 +700,13 @@ alert_location tls_handshake_client::read_finished()
 void tls_handshake_client::send_finished()
 {
 /// \todo Send Finished message.
+handshake_message_header handshake_msg_header;
+//declare a type
+handshake_msg_header.msg_type = handshake_types::FINISHED;
+for (int i = 0; i < 2; i++)
+{
+  handshake_msg_header.length[0] = ZERO;
+}
+handshake_msg_header.length[2] = hmac_sha2::digest_size;
 }
 
