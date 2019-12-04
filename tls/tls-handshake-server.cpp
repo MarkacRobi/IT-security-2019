@@ -121,34 +121,43 @@ size_t tls_handshake_server::getSizeOfIdentites(std::vector<uint8_t> clientPaylo
 
 alert_location tls_handshake_server::read_client_hello()
 {
-  /// \todo read the ClientHello message from the record layer and handle it
-
-  //get client_header
-  handshake_message_header clientHeaderHandshake = returnClientHeader();
-  if(handshake_types::CLIENT_HELLO != clientHeaderHandshake.msg_type)
-  {
-      return {local, unexpected_message};
-  }
-
-  size_t payload_length_param_1 = clientHeaderHandshake.length[0] << (EIGHT + EIGHT);
-  size_t payload_length_param_2 = clientHeaderHandshake.length[1] << EIGHT;
-  size_t payload_length = (size_t)(payload_length_param_1 + payload_length_param_2) + (size_t)(clientHeaderHandshake.length[2]);
-
-  std::vector<uint8_t > clientPayload = getClientPayload(payload_length);
-  if(clientPayload.at(0) != THREE)//probaj umjesto .at [] TODO
-      return {local, protocol_version};
-  else if(clientPayload.at(1) != THREE)
-      return {local, protocol_version};
-
-  HandshakePayload clientHello_random;
-  std::memcpy(&clientHello_random.random.random_bytes, &clientPayload[2], num_32);
-  clientHello_random.legacy_session_id.push_back(clientPayload.at(num_32 + 2));
-
-  if(clientHello_random.legacy_session_id.at(0) != 0)
-      return {local, illegal_parameter};
-
-  //TODO probaj dole staviti gdje se koritstin
+    /// \todo read the ClientHello message from the record layer and handle it
     std::vector<cipher_suite> cipher_suites_vector;
+    handshake_message_header clientHeaderHandshake;
+
+    std::vector<uint8_t> clientHeader;
+    setCurrentAlert(layer_.read(TLS_HANDSHAKE, clientHeader, sizeof(clientHeaderHandshake)));
+    setClientHeader(clientHeader);
+    checkError();
+
+    clientHeaderHandshake.msg_type = handshake_types(clientHeader[0]);
+    clientHeaderHandshake.length[0] = clientHeader[1];
+    clientHeaderHandshake.length[1] = clientHeader[2];
+    clientHeaderHandshake.length[2] = clientHeader[3];
+
+    if(clientHeaderHandshake.msg_type != handshake_types::CLIENT_HELLO)
+        return {local, unexpected_message};
+
+    size_t payload_length_param_1 = clientHeaderHandshake.length[0] << (EIGHT + EIGHT);
+    size_t payload_length_param_2 = clientHeaderHandshake.length[1] << EIGHT;
+    size_t payload_length = (size_t)(payload_length_param_1 + payload_length_param_2) + (size_t)(clientHeaderHandshake.length[2]);
+
+    std::vector<uint8_t> clientPayload = getClientPayload(payload_length);;
+
+    if(clientPayload.at(0) != THREE)//probaj umjesto .at [] TODO
+        return {local, protocol_version};
+    else if(clientPayload.at(1) != THREE)
+        return {local, protocol_version};
+
+    HandshakePayload clientHello_random;
+    std::memcpy(&clientHello_random.random.random_bytes, &clientPayload[2], num_32);
+    clientHello_random.legacy_session_id.push_back(clientPayload.at(num_32 + 2));
+
+    if(clientHello_random.legacy_session_id.at(0) != 0)
+        return {local, illegal_parameter};
+
+
+
     uint16_t length_of_cipher_suites_param1 = clientPayload.at(35) << EIGHT;
     size_t length_of_cipher_suites = (uint16_t)(clientPayload.at(36)) + (uint16_t)(length_of_cipher_suites_param1);
     auto i = 0;
@@ -163,103 +172,109 @@ alert_location tls_handshake_server::read_client_hello()
 
         cipher_suites_vector.push_back(cipher_suite_selected);
         i++;
+        i++;
+    }
+    Extension shareKey = getKeyShare(clientPayload);;
+
+    if(shareKey.type != ExtensionType::KEY_SHARE)
+        return {local, illegal_parameter};
+
+
+    KeyShareEntry shareKeyEntry = getKeyShareEntry(clientPayload);;
+
+    if(shareKeyEntry.group != NamedGroup::SECP_256_R1)
+        return {local, illegal_parameter};
+
+
+    uint16_t  size_of_key_param1 = clientPayload.at(53) << EIGHT;
+    uint16_t size_of_key = (uint16_t)(size_of_key_param1) + (uint16_t)(clientPayload.at(54));
+
+    keyForClient.resize(size_of_key);
+    memcpy(&keyForClient[0], &clientPayload[55], size_of_key);
+
+    setCurrentPosition(size_of_key + 55);
+
+    Extension selectedVersion = getExtension(clientPayload);
+
+    if(selectedVersion.type != ExtensionType::SUPPORTED_VERSIONS || clientPayload.at(currentPosition + 2) != 0 || clientPayload.at(currentPosition + 3) != 3 || clientPayload.at(currentPosition + 4) != 2
+       || clientPayload.at(currentPosition + 5) != TLSv1_3_MAJOR || clientPayload.at(currentPosition + 6) != TLSv1_3_MINOR)
+        return {local, illegal_parameter};
+
+    setCurrentPosition(currentPosition + 7);
+
+    Extension pskEx = getExtension(clientPayload);
+
+    if(pskEx.type != ExtensionType::PSK_KEY_EXCHANGE_MODES || clientPayload.at(currentPosition + 2) != 0 || clientPayload.at(currentPosition + 3) != 2
+       || clientPayload.at(currentPosition + 4) != 1 || clientPayload.at(currentPosition + 5) != PskKeyExchangeMode::PSK_DHE_KE)
+        return {local, illegal_parameter};
+
+    setCurrentPosition(currentPosition + 6);
+
+    Extension supportedGroups_ = getExtension(clientPayload);
+
+    if(supportedGroups_.type != ExtensionType::SUPPORTED_GROUPS || clientPayload.at(currentPosition + 2) != 0 || clientPayload.at(currentPosition + 3) != 4
+       || clientPayload.at(currentPosition + 4) != 0 || clientPayload.at(currentPosition + 5) != 2
+       || clientPayload.at(currentPosition + 6) != 0x0 || clientPayload.at(currentPosition + 7) != 0x17) //moze li 0x00 TODO
+        return {local, illegal_parameter};
+
+    setCurrentPosition(currentPosition + 8);
+
+    Extension preSharedKey = getExtension(clientPayload);
+
+    if(preSharedKey.type != ExtensionType::PRE_SHARED_KEY)
+        return {local, illegal_parameter};
+
+    setCurrentPosition(currentPosition + 4);
+
+    size_t sizeOfIdentities = (uint16_t) (clientPayload.at(currentPosition) << 8) + (uint16_t) clientPayload.at(currentPosition + 1);
+
+    std::vector<std::string> identities_vector;
+    for(size_t i = 0; i < sizeOfIdentities; i++)
+    {
+        if(i == 0 || i == 1)
+            continue;
+
+        size_t id_size = getSizeOfIdentites(clientPayload, i);
+        std::string id;
+        size_t iterator = 0;
+        while(iterator < id_size)
+        {
+            char letter_char = (char) clientPayload.at(currentPosition + 2 + iterator + i);
+            id.push_back(letter_char);
+            iterator++;
+        }
+        identities_vector.push_back(id);
+        i = id_size + i + 4;
     }
 
-  Extension shareKey = getKeyShare(clientPayload);
-  if(shareKey.type != ExtensionType::KEY_SHARE)
-      return {local, illegal_parameter};
+    uint16_t size_of_bidner_param1 = clientPayload[currentPosition + sizeOfIdentities + 2] >> 8;
+    size_of_bidner_param1 = size_of_bidner_param1 & 0xFF;
 
-  //rest??TODO
-  KeyShareEntry shareKeyEntry = getKeyShareEntry(clientPayload);
-  if(shareKeyEntry.group != NamedGroup::SECP_256_R1)
-      return {local, illegal_parameter};
+    uint16_t size_of_bidner_param2 = clientPayload[currentPosition + sizeOfIdentities + 3];
+    size_of_bidner_param2 = size_of_bidner_param2 & 0xFF;
+    size_t size_of_bidner = (uint16_t)(size_of_bidner_param1) +  (uint16_t)(size_of_bidner_param2);
 
-  uint16_t  size_of_key_param1 = clientPayload.at(53) << EIGHT;
-  uint16_t size_of_key = (uint16_t)(size_of_key_param1) + (uint16_t)(clientPayload.at(54));
 
-  setKeyForClient(clientPayload, size_of_key);//da li treba isto ovo za shareKeyEntry?? TODO
+    std::vector<uint8_t > bidners_vector;
+    bidners_vector.resize(size_of_bidner);//TODO provjeri jel moze
+    std::memcpy(&bidners_vector[0], &clientPayload[4 + sizeOfIdentities + currentPosition], size_of_bidner);
 
-  setCurrentPosition(size_of_key + 55);
-  Extension selectedVersion = getExtension(clientPayload);//da li ovo moze za sve Extension TODO
 
-  if(selectedVersion.type != ExtensionType::SUPPORTED_VERSIONS || clientPayload.at(currentPosition + 2) != 0 || clientPayload.at(currentPosition + 3) != 3 || clientPayload.at(currentPosition + 4) != 2
-    || clientPayload.at(currentPosition + 5) != TLSv1_3_MAJOR || clientPayload.at(currentPosition + 6) != TLSv1_3_MINOR)
-      return {local, illegal_parameter};
+    if(psks_.end() ==  psks_.find(identities_vector.at(ident_selected)))
+        return {local, internal_error};
 
-  setCurrentPosition(currentPosition + 7);
+    std::vector<uint8_t> psk_find = psks_.find(identities_vector.at(ident_selected))->second;//TODO moze li nula ovdje se koristiti
+    layer_.compute_early_secrets(psk_find, {});
+    selected_cipher_suite = cipher_suites_vector.at(0);
 
-  Extension pskEx = getExtension(clientPayload);
+    std::vector<uint8_t > data_handshake_server(clientHeader.size() + clientPayload.size());
 
-  if(pskEx.type != ExtensionType::PSK_KEY_EXCHANGE_MODES || clientPayload.at(currentPosition + 2) != 0 || clientPayload.at(currentPosition + 3) != 2
-    || clientPayload.at(currentPosition + 4) != 1 || clientPayload.at(currentPosition + 5) != PskKeyExchangeMode::PSK_DHE_KE)
-    return {local, illegal_parameter};
+    memcpy(&data_handshake_server[0], &clientHeader[0], clientHeader.size());
+    memcpy(&data_handshake_server[clientHeader.size()], &clientPayload[0], clientPayload.size());
 
-  setCurrentPosition(currentPosition + 6);
+    serverMessagesVector.insert(serverMessagesVector.end(), data_handshake_server.begin(), data_handshake_server.end());
 
-  Extension supportedGroups_ = getExtension(clientPayload);
-
-  if(supportedGroups_.type != ExtensionType::SUPPORTED_GROUPS || clientPayload.at(currentPosition + 2) != 0 || clientPayload.at(currentPosition + 3) != 4
-  || clientPayload.at(currentPosition + 4) != 0 || clientPayload.at(currentPosition + 5) != 2
-  || clientPayload.at(currentPosition + 6) != 0x0 || clientPayload.at(currentPosition + 7) != 0x17) //moze li 0x00 TODO
-    return {local, illegal_parameter};
-
-  setCurrentPosition(currentPosition + 8);
-
-  Extension preSharedKey = getExtension(clientPayload);
-  if(preSharedKey.type != ExtensionType::PRE_SHARED_KEY)
-      return {local, illegal_parameter};
-
-  setCurrentPosition(currentPosition + 2);
-
-  size_t  bidners_selected = getSizeOfIdentites(clientPayload, 0);//TODO treba li ovo uopste jer se nigdje ne koristi
-
-  setCurrentPosition(currentPosition + 2);
-  std::vector<std::string> identities_vector;
-  size_t sizeOfIdentities = getSizeOfIdentites(clientPayload, 0);
-  for(auto i = 0; i < sizeOfIdentities; i++)
-  {
-      if(i == 0 || i == 1)
-          continue;
-
-      size_t id_size = getSizeOfIdentites(clientPayload, i);
-      size_t iterator = 0;
-      std::string id = NULL;//TODO provjeri
-      while(iterator < id_size)
-      {
-          char letter_char = (char) clientPayload.at(currentPosition + 2 + iterator + i);
-          id.push_back(letter_char);
-          iterator++;
-      }
-      identities_vector.push_back(id);
-      i = id_size + i + 4;
-  }
-
-  uint16_t size_of_bidner_param1 = clientPayload[currentPosition + sizeOfIdentities + 2] >> 8;
-  size_of_bidner_param1 = size_of_bidner_param1 & 0xFF;
-
-  uint16_t size_of_bidner_param2 = clientPayload[currentPosition + sizeOfIdentities + 3];
-  size_of_bidner_param2 = size_of_bidner_param2 & 0xFF;
-  size_t size_of_bidner = (uint16_t)(size_of_bidner_param1) +  (uint16_t)(size_of_bidner_param2);
-
-  std::vector<uint8_t > bidners_vector;
-  bidners_vector.resize(size_of_bidner);//TODO provjeri jel moze
-  std::memcpy(&bidners_vector[0], &clientPayload[4 + sizeOfIdentities + currentPosition], size_of_bidner);
-
-  if(psks_.end() ==  psks_.find(identities_vector.at(ident_selected)))
-    return {local, internal_error};
-
-  std::vector<uint8_t> psk_find = psks_.find(identities_vector.at(ident_selected))->second;//TODO moze li nula ovdje se koristiti
-  layer_.compute_early_secrets(psk_find, {});
-
-  selected_cipher_suite = cipher_suites_vector.at(0);
-
-  //provjeri jel dobar clientHeader TODO
-  std::vector<uint8_t > data_handshake_server(clientHeader.size() + clientPayload.size());//TODO da li treba resize
-  memcpy(&data_handshake_server[0], &clientHeader[0], clientHeader.size());
-  memcpy(&data_handshake_server[clientHeader.size()], &clientPayload[0], clientPayload.size());
-
-  serverMessagesVector.insert(serverMessagesVector.end(), data_handshake_server.begin(), data_handshake_server.end());
-  return {local, ok};
+    return {local, ok};
 }
 
 void tls_handshake_server::setSereverHelloMessageSize(size_t size)
@@ -274,73 +289,65 @@ void tls_handshake_server::setExtenesionSize(size_t size)
 
 void tls_handshake_server::send_server_hello()
 {
-/// \todo write the ServerHello message to the record layer
-/// If have_fixed_randomness_ is false, generate random data.
-/// If it is true, use fixed_randomness_ as random data.
+
     size_t position = 20 + 20;
-    extensionSize = 0;
     serverHelloMessageSize = 0;
+
 
     handshake_message_header handshakeMessageHeader;
     handshakeMessageHeader.msg_type = handshake_types::SERVER_HELLO;
-    HandshakePayload serverHelloMessage;
-    serverHelloMessage.legacy_version = SERVER_LEGACY;
 
-    setSereverHelloMessageSize(1);
-    setSereverHelloMessageSize(1);
+    HandshakePayload serverHelloMessage;
+    serverHelloMessage.legacy_version = 0x0303;
+
 
     if(!have_fixed_randomness_)
     {
-
-
         get_random_data(reinterpret_cast<uint8_t *>(serverHelloMessage.random.random_bytes), num_32);
     }
     else{
         std::memcpy(&serverHelloMessage.random.random_bytes, &fixed_randomness_, num_32);
 
-
     }
-    setSereverHelloMessageSize(num_32);
+
     serverHelloMessage.legacy_compression_methods.push_back(0);
+
     serverHelloMessage.legacy_session_id.push_back(0);
 
     serverHelloMessage.cipher_suites.push_back(selected_cipher_suite);
-    setSereverHelloMessageSize(2);
-    setSereverHelloMessageSize(2);
+
 
     Extension versionSupported;
 
-    versionSupported.data.push_back(TLSv1_3_MAJOR);//TODO Check redoslijed
-    versionSupported.data.push_back(TLSv1_3_MINOR);
+    versionSupported.data.push_back(TLSv1_3.major);
+    versionSupported.data.push_back(TLSv1_3.minor);
     versionSupported.type = ExtensionType::SUPPORTED_VERSIONS;
 
-    setExtenesionSize(3);
-    setExtenesionSize(3);
-
     Extension sharedKey;
-    KeyShareEntry keyShareEntry;
-    std::vector<uint8_t > data_for_ecdh = ecdh_.get_data();
 
+    KeyShareEntry keyShareEntry;
+    std::vector<uint8_t> data_for_ecdh = ecdh_.get_data();
     keyShareEntry.group = NamedGroup::SECP_256_R1;
     sharedKey.type = ExtensionType::KEY_SHARE;
 
     sharedKey.data.resize(ecdh_.get_data().size() + 2 + 2);//TODO check
-    sharedKey.data[3] = (ecdh_.get_data().size()  >> 0 & 0xFF);
+    sharedKey.data[3] = (ecdh_.get_data().size()  & 0xFF);
     sharedKey.data[2] = (ecdh_.get_data().size()  >> 8 & 0xFF);
     NamedGroup sharedKeyShiftValue = keyShareEntry.group;
-    sharedKey.data[1] = (sharedKeyShiftValue  >> 0 & 0xFF);
+    sharedKey.data[1] = (sharedKeyShiftValue  & 0xFF);
     sharedKey.data[0] = (sharedKeyShiftValue  >> 8 & 0xFF);
 
     memcpy(&sharedKey.data[2+2], &data_for_ecdh[0], ecdh_.get_data().size());
-    setExtenesionSize(sharedKey.data.size() + 3 + 1);
+
+
+    setExtenesionSize(sharedKey.data.size() + 10);
 
     Extension sharedKeyPre;
     sharedKeyPre.data.push_back((ident_selected >> 8) & 0xFF);
     sharedKeyPre.data.push_back(ident_selected & 0xFF);
 
     sharedKeyPre.type = ExtensionType::PRE_SHARED_KEY;
-
-    setExtenesionSize(sharedKey.data.size() + 3 + 1);
+    setExtenesionSize(sharedKeyPre.data.size() + 3 + 1);
 
     serverHelloMessage.extensions.push_back(sharedKey);
 
@@ -348,6 +355,7 @@ void tls_handshake_server::send_server_hello()
     serverHelloMessage.extensions.push_back(versionSupported);
     serverHelloMessage.extensions.push_back(sharedKeyPre);
 
+    setSereverHelloMessageSize(num_32  + 6);
     std::vector<uint8_t >handshakePayload;
     handshakePayload.resize(2 + extensionSize + serverHelloMessageSize);//TODO da li moze resize ovdje
 
@@ -363,11 +371,11 @@ void tls_handshake_server::send_server_hello()
     handshakePayload[38] = (uint8_t)((extensionSize >> EIGHT * 1) & 0xFF);
 
     size_t i = 0;
-
     while(i < serverHelloMessage.extensions.size())
     {
         handshakePayload[position] = ((serverHelloMessage.extensions[i].type >> EIGHT) & 0xFF);
-        handshakePayload[position + 1] = ((serverHelloMessage.extensions[i].type >> EIGHT) & 0xFF);
+        handshakePayload[position + 1] = ((serverHelloMessage.extensions[i].type >> 0) & 0xFF);
+
 
         if(i == 0)
         {
@@ -387,11 +395,11 @@ void tls_handshake_server::send_server_hello()
             handshakePayload[position + 3] = (uint16_t)(((sharedKeyPre.data.size()) >> 0) & 0xFF);
             position = position + 4;
         }
+
         std::memcpy(&handshakePayload[position], &serverHelloMessage.extensions[i].data[0], serverHelloMessage.extensions[i].data.size());
         position = serverHelloMessage.extensions[i].data.size() + position;
         i++;
     }
-
 
     handshakeMessageHeader.length[2] = ((handshakePayload.size() >> 0) & 0xFF);
     handshakeMessageHeader.length[1] = ((handshakePayload.size() >> 8) & 0xFF);
@@ -406,6 +414,7 @@ void tls_handshake_server::send_server_hello()
     layer_.write(TLS_HANDSHAKE, data_for_client);
     serverMessagesVector.insert(serverMessagesVector.end(), data_for_client.begin(), data_for_client.end());
 }
+
 
 std::vector<uint8_t > tls_handshake_server::vectorForSending()
 {
