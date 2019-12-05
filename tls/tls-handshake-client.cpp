@@ -696,17 +696,58 @@ alert_location tls_handshake_client::read_finished()
 
 	return {local, ok};
 }
+void tls_handshake_client::push_to_layer(std::vector<uint8_t> vector_to_server)
+{
+  layer_.write(TLS_HANDSHAKE, vector_to_server);
+  layer_.compute_application_traffic_keys(vector_of_client_msg);
+  layer_.update_read_key();
+  layer_.update_write_key();
+  vector_of_client_msg.insert(vector_of_client_msg.end(), vector_to_server.begin(), vector_to_server.end()); 
 
+}
 void tls_handshake_client::send_finished()
 {
 /// \todo Send Finished message.
-handshake_message_header handshake_msg_header;
-//declare a type
-handshake_msg_header.msg_type = handshake_types::FINISHED;
-for (int i = 0; i < 2; i++)
-{
-  handshake_msg_header.length[0] = ZERO;
-}
-handshake_msg_header.length[2] = hmac_sha2::digest_size;
+  
+  sha2 sha2_hash_to_client;
+  size_t size_of_client_msg = vector_of_client_msg.size();
+  handshake_message_header handshake_msg_header;
+  hmac_sha2::digest_storage hmac_sha2_digest_store;
+  std::vector<uint8_t> vector_signal_end;
+  //declare a type
+  handshake_msg_header.msg_type = handshake_types::FINISHED;
+  for (int i = 0; i < 2; i++)
+  {
+		handshake_msg_header.length[i] = ZERO;
+  }
+  handshake_msg_header.length[2] = hmac_sha2::digest_size;
+
+  std::vector<uint8_t> vector_to_server;
+  vector_to_server.push_back(handshake_types::FINISHED);
+  for (int i = 0; i < 3; i++)
+  {
+	  vector_to_server.push_back(handshake_msg_header.length[i]);
+  }
+  
+  
+  sha2_hash_to_client.update(&vector_of_client_msg[ZERO],
+							size_of_client_msg);
+  hmac_sha2_digest_store = sha2_hash_to_client.digest();
+	
+  sha2::digest_storage digest_store_hash;	
+  vector_signal_end = layer_.get_finished_key(connection_end::CLIENT);
+  hmac_sha2 hmac(&vector_signal_end[ZERO], vector_signal_end.size());  
+  hmac.update(hmac_sha2_digest_store.data(), 
+			  hmac_sha2_digest_store.size());
+
+  digest_store_hash  = hmac.digest();
+
+  for(auto it : digest_store_hash)
+  {
+		vector_to_server.push_back(it);
+  }
+
+  push_to_layer(vector_to_server);
+
 }
 

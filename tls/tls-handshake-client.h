@@ -26,6 +26,7 @@ private:
   void send_client_hello();
   alert_location read_server_hello();
   void send_finished();
+  
   alert_location read_finished();
 
   /// The underlying record layer
@@ -35,6 +36,7 @@ private:
 
   void set_layer(cipher_suite cipher_suite_to_select, std::vector<uint8_t> vector_edch_data_share);
   std::vector<uint8_t> vector_of_client_msg; 
+  void push_to_layer(std::vector<uint8_t> vector_to_server);
   
   /// ECDH instance.
   ecdh ecdh_;
