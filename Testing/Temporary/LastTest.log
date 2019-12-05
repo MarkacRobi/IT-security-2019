@@ -1,0 +1,569 @@
+Start testing: Dec 05 17:03 CET
+----------------------------------------------------------
+1/30 Testing: hkdf
+1/30 Test: hkdf
+Command: "/home/its2019/its2019g25/tls/tests/test_hkdf" "/home/its2019/its2019g25/tls/tests/hkdf.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"hkdf" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): HKDF
+100%: Checks: 5, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:RFC 5869:short_input:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:RFC 5869:long_input:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:RFC 5869:zero_input:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:TLS:expand_label:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:TLS:derive_secret:0: Passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"hkdf" end time: Dec 05 17:03 CET
+"hkdf" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/30 Testing: nonce
+2/30 Test: nonce
+Command: "/home/its2019/its2019g25/tls/tests/test_nonce" "/home/its2019/its2019g25/tls/tests/nonce.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"nonce" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): Nonce
+100%: Checks: 3, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/nonce.cpp:30:P:Nonce:simple_aesgcm:0: Passed
+/home/its2019/its2019g25/tls/tests/nonce.cpp:48:P:Nonce:loop_aesgcm:0: Passed
+/home/its2019/its2019g25/tls/tests/nonce.cpp:60:P:Nonce:reset_aesgcm:0: Passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"nonce" end time: Dec 05 17:03 CET
+"nonce" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/30 Testing: sha2
+3/30 Test: sha2
+Command: "/home/its2019/its2019g25/tls/tests/test_sha2" "/home/its2019/its2019g25/tls/tests/sha2.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"sha2" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): SHA2
+100%: Checks: 4, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/sha2.cpp:30:P:SHA2:test_0:0: Passed
+/home/its2019/its2019g25/tls/tests/sha2.cpp:37:P:SHA2:test_1:0: Passed
+/home/its2019/its2019g25/tls/tests/sha2.cpp:44:P:SHA2:test_2:0: Passed
+/home/its2019/its2019g25/tls/tests/sha2.cpp:51:P:SHA2:test_3:0: Passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"sha2" end time: Dec 05 17:03 CET
+"sha2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/30 Testing: hmac_sha2
+4/30 Test: hmac_sha2
+Command: "/home/its2019/its2019g25/tls/tests/test_hmac_sha2" "/home/its2019/its2019g25/tls/tests/hmac_sha2.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"hmac_sha2" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): HMAC_SHA2
+100%: Checks: 17, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:133:P:FIPS:fips_1:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:141:P:FIPS:fips_2:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:149:P:FIPS:fips_3:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:156:P:RFC 2202:rfc2202_1:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:163:P:RFC 2202:rfc2202_2:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:170:P:RFC 2202:rfc2202_3:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:177:P:RFC 2202:rfc2202_4:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:184:P:RFC 2202:rfc2202_5:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:191:P:RFC 2202:rfc2202_6:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:198:P:RFC 2202:rfc2202_7:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:205:P:RFC 2202:rfc2202_1_i:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:212:P:RFC 2202:rfc2202_2_i:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:219:P:RFC 2202:rfc2202_3_i:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:226:P:RFC 2202:rfc2202_4_i:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:233:P:RFC 2202:rfc2202_5_i:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:240:P:RFC 2202:rfc2202_6_i:0: Passed
+/home/its2019/its2019g25/tls/tests/hmac_sha2.cpp:247:P:RFC 2202:rfc2202_7_i:0: Passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"hmac_sha2" end time: Dec 05 17:03 CET
+"hmac_sha2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/30 Testing: ascon
+5/30 Test: ascon
+Command: "/home/its2019/its2019g25/tls/tests/test_ascon" "/home/its2019/its2019g25/tls/tests/ascon.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"ascon" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): Ascon
+100%: Checks: 5, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Functionality:encrypt_decrypt_ascon:0: Passed
+/home/its2019/its2019g25/tls/tests/ascon.cpp:70:P:Functionality:encrypt_decrypt_ad_ascon:0: Passed
+/home/its2019/its2019g25/tls/tests/ascon.cpp:91:P:Functionality:encrypt_decrypt_distinct_ascon:0: Passed
+/home/its2019/its2019g25/tls/tests/ascon.cpp:116:P:Functionality:encrypt_decrypt_fail_ascon:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Test vector:encrypt_ascon:0: Passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ascon" end time: Dec 05 17:03 CET
+"ascon" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/30 Testing: aesgcm
+6/30 Test: aesgcm
+Command: "/home/its2019/its2019g25/tls/tests/test_aesgcm" "/home/its2019/its2019g25/tls/tests/aesgcm.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"aesgcm" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): AES-GCM
+100%: Checks: 5, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Functionality:encrypt_decrypt:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Functionality:encrypt_decrypt_ad:0: Passed
+/home/its2019/its2019g25/tls/tests/aesgcm.cpp:92:P:Functionality:encrypt_decrypt_distinct:0: Passed
+/home/its2019/its2019g25/tls/tests/aesgcm.cpp:117:P:Functionality:encrypt_decrypt_fail:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Test vectors:encrypt_2_2_1:0: Passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"aesgcm" end time: Dec 05 17:03 CET
+"aesgcm" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/30 Testing: random
+7/30 Test: random
+Command: "/home/its2019/its2019g25/tls/tests/test_random" "/home/its2019/its2019g25/tls/tests/random.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"random" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): Random
+100%: Checks: 2, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/random.cpp:18:P:Basic:simple:0: Passed
+/home/its2019/its2019g25/tls/tests/random.cpp:31:P:Basic:twice:0: Passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"random" end time: Dec 05 17:03 CET
+"random" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/30 Testing: task1_custom
+8/30 Test: task1_custom
+Command: "/home/its2019/its2019g25/tls/tests/test_task1_custom" "/home/its2019/its2019g25/tls/tests/task1_custom.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"task1_custom" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): Student Task 1 Tests
+100%: Checks: 6, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/task1_custom.cpp:94:P:Nonce test:nounce_test_1:0: Passed
+/home/its2019/its2019g25/tls/tests/task1_custom.cpp:118:P:Nonce test:nounce_test_2:0: Passed
+/home/its2019/its2019g25/tls/tests/task1_custom.cpp:134:P:Hmac test:hmac_test1:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:15:P:Ascon test:ascon_test1:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:15:P:Aes gcm test:aes_gcm_test1:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:15:P:Hkdf test:hkdf_test1:0: Passed
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"task1_custom" end time: Dec 05 17:03 CET
+"task1_custom" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/30 Testing: tls_ascon_1
+9/30 Test: tls_ascon_1
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "ascon" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-1.chal" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-1.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_ascon_1" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"tls_ascon_1" end time: Dec 05 17:03 CET
+"tls_ascon_1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/30 Testing: tls_aes128gcm_1
+10/30 Test: tls_aes128gcm_1
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "aes128gcm" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-1.chal" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-1.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_aes128gcm_1" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"tls_aes128gcm_1" end time: Dec 05 17:03 CET
+"tls_aes128gcm_1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/30 Testing: tls_isap_1
+11/30 Test: tls_isap_1
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "isap" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-1.chal" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-1.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_isap_1" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Records do not match.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"tls_isap_1" end time: Dec 05 17:03 CET
+"tls_isap_1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/30 Testing: tls_ascon_2
+12/30 Test: tls_ascon_2
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "ascon" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-2.chal" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-2.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_ascon_2" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"tls_ascon_2" end time: Dec 05 17:03 CET
+"tls_ascon_2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/30 Testing: tls_aes128gcm_2
+13/30 Test: tls_aes128gcm_2
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "aes128gcm" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-2.chal" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-2.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_aes128gcm_2" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"tls_aes128gcm_2" end time: Dec 05 17:03 CET
+"tls_aes128gcm_2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/30 Testing: tls_isap_2
+14/30 Test: tls_isap_2
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "isap" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-2.chal" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-2.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_isap_2" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Records do not match.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"tls_isap_2" end time: Dec 05 17:03 CET
+"tls_isap_2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/30 Testing: tls_ascon_3
+15/30 Test: tls_ascon_3
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "ascon" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-3.chal" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-3.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_ascon_3" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"tls_ascon_3" end time: Dec 05 17:03 CET
+"tls_ascon_3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/30 Testing: tls_aes128gcm_3
+16/30 Test: tls_aes128gcm_3
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "aes128gcm" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-3.chal" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-3.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_aes128gcm_3" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"tls_aes128gcm_3" end time: Dec 05 17:03 CET
+"tls_aes128gcm_3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/30 Testing: tls_isap_3
+17/30 Test: tls_isap_3
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "isap" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-3.chal" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-3.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_isap_3" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Records do not match.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"tls_isap_3" end time: Dec 05 17:03 CET
+"tls_isap_3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/30 Testing: tls_ascon_4
+18/30 Test: tls_ascon_4
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "ascon" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-4.chal" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-4.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_ascon_4" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"tls_ascon_4" end time: Dec 05 17:03 CET
+"tls_ascon_4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/30 Testing: tls_aes128gcm_4
+19/30 Test: tls_aes128gcm_4
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "aes128gcm" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-4.chal" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-4.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_aes128gcm_4" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"tls_aes128gcm_4" end time: Dec 05 17:03 CET
+"tls_aes128gcm_4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/30 Testing: tls_isap_4
+20/30 Test: tls_isap_4
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "isap" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-4.chal" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-4.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_isap_4" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Records do not match.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"tls_isap_4" end time: Dec 05 17:03 CET
+"tls_isap_4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/30 Testing: tls_ascon_5
+21/30 Test: tls_ascon_5
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "ascon" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-5.chal" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-5.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_ascon_5" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"tls_ascon_5" end time: Dec 05 17:03 CET
+"tls_ascon_5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/30 Testing: tls_aes128gcm_5
+22/30 Test: tls_aes128gcm_5
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "aes128gcm" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-5.chal" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-5.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_aes128gcm_5" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"tls_aes128gcm_5" end time: Dec 05 17:03 CET
+"tls_aes128gcm_5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/30 Testing: tls_isap_5
+23/30 Test: tls_isap_5
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "isap" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-5.chal" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-5.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_isap_5" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Records do not match.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"tls_isap_5" end time: Dec 05 17:03 CET
+"tls_isap_5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/30 Testing: tls_ascon_6
+24/30 Test: tls_ascon_6
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "ascon" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-6.chal" "/home/its2019/its2019g25/tls/tests/data/ascon-testcase-6.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_ascon_6" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"tls_ascon_6" end time: Dec 05 17:03 CET
+"tls_ascon_6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/30 Testing: tls_aes128gcm_6
+25/30 Test: tls_aes128gcm_6
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "aes128gcm" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-6.chal" "/home/its2019/its2019g25/tls/tests/data/aes128gcm-testcase-6.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_aes128gcm_6" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"tls_aes128gcm_6" end time: Dec 05 17:03 CET
+"tls_aes128gcm_6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/30 Testing: tls_isap_6
+26/30 Test: tls_isap_6
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_encrypted_record" "isap" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-6.chal" "/home/its2019/its2019g25/tls/tests/data/isap-testcase-6.sol"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_isap_6" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Records do not match.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"tls_isap_6" end time: Dec 05 17:03 CET
+"tls_isap_6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/30 Testing: ecdh
+27/30 Test: ecdh
+Command: "/home/its2019/its2019g25/tls/tests/test_ecdh" "/home/its2019/its2019g25/tls/tests/ecdh.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"ecdh" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): TLS
+0%: Checks: 2, Failures: 2, Errors: 0
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:15:F:ECDH:ecdh_serialization:0: Assertion 'lhs.size() == rhs.size()' failed: lhs.size() == 0, rhs.size() == 130
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:15:F:ECDH:ecdh_phase_two:0: Assertion 'lhs.size() == rhs.size()' failed: lhs.size() == 0, rhs.size() == 64
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Failed.
+"ecdh" end time: Dec 05 17:03 CET
+"ecdh" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/30 Testing: tls_record_layer
+28/30 Test: tls_record_layer
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_record_layer" "/home/its2019/its2019g25/tls/tests/tls_record_layer.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_record_layer" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): TLS
+100%: Checks: 9, Failures: 0, Errors: 0
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_compute_early_secrets:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_compute_handshake_traffic_keys:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_compute_handshake_derived_key:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_handshake_encrypted:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_application_data_encrypted:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_handshake_encrypted_type:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_application_data_encrypted_type:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_handshake_encrypted_expected:0: Passed
+/home/its2019/its2019g25/tls/tests/../../utils/tests.h:23:P:Record layer:record_layer_application_data_encrypted_expected:0: Passed
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"tls_record_layer" end time: Dec 05 17:03 CET
+"tls_record_layer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/30 Testing: tls_handshake
+29/30 Test: tls_handshake
+Command: "/home/its2019/its2019g25/tls/tests/test_tls_handshake" "/home/its2019/its2019g25/tls/tests/tls_handshake.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"tls_handshake" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): TLS
+playback: waiting for input of 5 bytes
+Found mismatch in byte 0: got 15 expected 16
+playback: waiting for input of 5 bytes
+Found mismatch in byte 0: got 15 expected 16
+playback: waiting for input of 5 bytes
+Found mismatch in byte 0: got 15 expected 16
+playback: waiting for input of 5 bytes
+Found mismatch in byte 0: got 15 expected 16
+playback: writing 5 bytes
+playback: writing 202 bytes
+playback error: write: Broken pipe
+playback: writing 5 bytes
+playback: writing 202 bytes
+playback error: write: Broken pipe
+playback: writing 5 bytes
+playback: writing 200 bytes
+playback error: write: Broken pipe
+playback: writing 5 bytes
+playback: writing 202 bytes
+playback error: write: Broken pipe
+0%: Checks: 8, Failures: 8, Errors: 0
+/home/its2019/its2019g25/tls/tests/tls_handshake.cpp:229:F:Client:client_handshake_ok:0: Assertion 'server_ret == 0' failed: server_ret == 1, 0 == 0
+/home/its2019/its2019g25/tls/tests/tls_handshake.cpp:229:F:Client:client_handshake_ok_data:0: Assertion 'server_ret == 0' failed: server_ret == 1, 0 == 0
+/home/its2019/its2019g25/tls/tests/tls_handshake.cpp:229:F:Client:client_handshake_change_client_cs:0: Assertion 'server_ret == 0' failed: server_ret == 1, 0 == 0
+/home/its2019/its2019g25/tls/tests/tls_handshake.cpp:229:F:Client:client_handshake_change_server_cs:0: Assertion 'server_ret == 0' failed: server_ret == 1, 0 == 0
+/home/its2019/its2019g25/tls/tests/tls_handshake.cpp:124:F:Server:server_handshake_ok:0: Assertion 'client_ret == 0' failed: client_ret == 18446744073709551615, 0 == 0
+/home/its2019/its2019g25/tls/tests/tls_handshake.cpp:124:F:Server:server_handshake_ok_data:0: Assertion 'client_ret == 0' failed: client_ret == 18446744073709551615, 0 == 0
+/home/its2019/its2019g25/tls/tests/tls_handshake.cpp:124:F:Server:server_handshake_change_client_cs:0: Assertion 'client_ret == 0' failed: client_ret == 18446744073709551615, 0 == 0
+/home/its2019/its2019g25/tls/tests/tls_handshake.cpp:124:F:Server:server_handshake_change_server_cs:0: Assertion 'client_ret == 0' failed: client_ret == 18446744073709551615, 0 == 0
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Failed.
+"tls_handshake" end time: Dec 05 17:03 CET
+"tls_handshake" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/30 Testing: task2_custom
+30/30 Test: task2_custom
+Command: "/home/its2019/its2019g25/tls/tests/test_task2_custom" "/home/its2019/its2019g25/tls/tests/task2_custom.xml"
+Directory: /home/its2019/its2019g25/tls/tests
+"task2_custom" start time: Dec 05 17:03 CET
+Output:
+----------------------------------------------------------
+Running suite(s): Student Task 2 Tests
+100%: Checks: 0, Failures: 0, Errors: 0
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"task2_custom" end time: Dec 05 17:03 CET
+"task2_custom" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 05 17:03 CET

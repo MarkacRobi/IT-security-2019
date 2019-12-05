@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC  -Wall -fdiagnostics-color=auto -Wextra -pedantic -Werror=vla -Werror=implicit-function-declaration -pthread -O2 -g -DNDEBUG  -shared -Wl,-soname,libisap.so -o libisap.so CMakeFiles/isap.dir/Ascon-reference.c.o CMakeFiles/isap.dir/decrypt.c.o CMakeFiles/isap.dir/encrypt.c.o CMakeFiles/isap.dir/isap.c.o CMakeFiles/isap.dir/permutation.c.o 

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:41</datetime>
+  <suite>
+    <title>Student Task 2 Tests</title>
+  </suite>
+  <duration>0.000101</duration>
+</testsuites>

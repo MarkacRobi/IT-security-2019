@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC  -Wall -fdiagnostics-color=auto -Wextra -pedantic -Werror=vla -Werror=implicit-function-declaration -pthread -O2 -g -DNDEBUG  -shared -Wl,-soname,libascon.so -o libascon.so CMakeFiles/ascon.dir/ascon.c.o 

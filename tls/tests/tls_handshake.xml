@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:41</datetime>
+  <suite>
+    <title>TLS</title>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>tls_handshake.cpp:229</fn>
+      <id>client_handshake_ok</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>Client</description>
+      <message>Assertion &apos;server_ret == 0&apos; failed: server_ret == 1, 0 == 0</message>
+    </test>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>tls_handshake.cpp:229</fn>
+      <id>client_handshake_ok_data</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>Client</description>
+      <message>Assertion &apos;server_ret == 0&apos; failed: server_ret == 1, 0 == 0</message>
+    </test>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>tls_handshake.cpp:229</fn>
+      <id>client_handshake_change_client_cs</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>Client</description>
+      <message>Assertion &apos;server_ret == 0&apos; failed: server_ret == 1, 0 == 0</message>
+    </test>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>tls_handshake.cpp:229</fn>
+      <id>client_handshake_change_server_cs</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>Client</description>
+      <message>Assertion &apos;server_ret == 0&apos; failed: server_ret == 1, 0 == 0</message>
+    </test>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>tls_handshake.cpp:124</fn>
+      <id>server_handshake_ok</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>Server</description>
+      <message>Assertion &apos;client_ret == 0&apos; failed: client_ret == 18446744073709551615, 0 == 0</message>
+    </test>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>tls_handshake.cpp:124</fn>
+      <id>server_handshake_ok_data</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>Server</description>
+      <message>Assertion &apos;client_ret == 0&apos; failed: client_ret == 18446744073709551615, 0 == 0</message>
+    </test>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>tls_handshake.cpp:124</fn>
+      <id>server_handshake_change_client_cs</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>Server</description>
+      <message>Assertion &apos;client_ret == 0&apos; failed: client_ret == 18446744073709551615, 0 == 0</message>
+    </test>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>tls_handshake.cpp:124</fn>
+      <id>server_handshake_change_server_cs</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>Server</description>
+      <message>Assertion &apos;client_ret == 0&apos; failed: client_ret == 18446744073709551615, 0 == 0</message>
+    </test>
+  </suite>
+  <duration>0.098998</duration>
+</testsuites>

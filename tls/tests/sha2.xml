@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:40</datetime>
+  <suite>
+    <title>SHA2</title>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>sha2.cpp:30</fn>
+      <id>test_0</id>
+      <iteration>0</iteration>
+      <duration>0.000069</duration>
+      <description>SHA2</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>sha2.cpp:37</fn>
+      <id>test_1</id>
+      <iteration>0</iteration>
+      <duration>0.000067</duration>
+      <description>SHA2</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>sha2.cpp:44</fn>
+      <id>test_2</id>
+      <iteration>0</iteration>
+      <duration>0.000065</duration>
+      <description>SHA2</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>sha2.cpp:51</fn>
+      <id>test_3</id>
+      <iteration>0</iteration>
+      <duration>0.000068</duration>
+      <description>SHA2</description>
+      <message>Passed</message>
+    </test>
+  </suite>
+  <duration>0.001643</duration>
+</testsuites>

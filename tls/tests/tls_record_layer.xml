@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:41</datetime>
+  <suite>
+    <title>TLS</title>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_compute_early_secrets</id>
+      <iteration>0</iteration>
+      <duration>0.000161</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_compute_handshake_traffic_keys</id>
+      <iteration>0</iteration>
+      <duration>0.000248</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_compute_handshake_derived_key</id>
+      <iteration>0</iteration>
+      <duration>0.000249</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_handshake_encrypted</id>
+      <iteration>0</iteration>
+      <duration>0.002229</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_application_data_encrypted</id>
+      <iteration>0</iteration>
+      <duration>0.003023</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_handshake_encrypted_type</id>
+      <iteration>0</iteration>
+      <duration>0.002373</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_application_data_encrypted_type</id>
+      <iteration>0</iteration>
+      <duration>0.002354</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_handshake_encrypted_expected</id>
+      <iteration>0</iteration>
+      <duration>0.016036</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>record_layer_application_data_encrypted_expected</id>
+      <iteration>0</iteration>
+      <duration>0.002453</duration>
+      <description>Record layer</description>
+      <message>Passed</message>
+    </test>
+  </suite>
+  <duration>0.037713</duration>
+</testsuites>
