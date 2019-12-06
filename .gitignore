@@ -95,6 +95,8 @@ fabric.properties
 **/build
 **/.idea
 
+#VSCode
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:41</datetime>
+  <suite>
+    <title>Random</title>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>random.cpp:18</fn>
+      <id>simple</id>
+      <iteration>0</iteration>
+      <duration>0.000076</duration>
+      <description>Basic</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>random.cpp:31</fn>
+      <id>twice</id>
+      <iteration>0</iteration>
+      <duration>0.000074</duration>
+      <description>Basic</description>
+      <message>Passed</message>
+    </test>
+  </suite>
+  <duration>0.000871</duration>
+</testsuites>

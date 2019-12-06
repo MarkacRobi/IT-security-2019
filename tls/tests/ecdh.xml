@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:41</datetime>
+  <suite>
+    <title>TLS</title>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:15</fn>
+      <id>ecdh_serialization</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>ECDH</description>
+      <message>Assertion &apos;lhs.size() == rhs.size()&apos; failed: lhs.size() == 0, rhs.size() == 130</message>
+    </test>
+    <test result="failure">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:15</fn>
+      <id>ecdh_phase_two</id>
+      <iteration>0</iteration>
+      <duration>-1.000000</duration>
+      <description>ECDH</description>
+      <message>Assertion &apos;lhs.size() == rhs.size()&apos; failed: lhs.size() == 0, rhs.size() == 64</message>
+    </test>
+  </suite>
+  <duration>0.005256</duration>
+</testsuites>

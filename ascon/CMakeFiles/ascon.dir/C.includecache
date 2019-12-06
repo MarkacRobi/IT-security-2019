@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/its2019/its2019g25/ascon/api.h
+
+/home/its2019/its2019g25/ascon/ascon.c
+stdio.h
+-
+api.h
+/home/its2019/its2019g25/ascon/api.h
+crypto_aead.h
+/home/its2019/its2019g25/ascon/crypto_aead.h
+
+/home/its2019/its2019g25/ascon/crypto_aead.h
+

@@ -1,0 +1,39 @@
+hkdf 14 0.000409297
+nonce 14 0.000291654
+sha2 14 0.000258514
+hmac_sha2 14 0.000595348
+ascon 14 0.000304631
+aesgcm 14 0.000462362
+random 14 0.000315581
+task1_custom 14 0.00732364
+tls_ascon_1 14 0.000144993
+tls_aes128gcm_1 14 0.000359484
+tls_isap_1 0 0
+tls_ascon_2 14 0.000123416
+tls_aes128gcm_2 14 0.000349505
+tls_isap_2 0 0
+tls_ascon_3 14 0.000123995
+tls_aes128gcm_3 14 0.000714643
+tls_isap_3 0 0
+tls_ascon_4 14 0.000193221
+tls_aes128gcm_4 14 0.000460642
+tls_isap_4 0 0
+tls_ascon_5 14 0.00012907
+tls_aes128gcm_5 14 0.000847493
+tls_isap_5 0 0
+tls_ascon_6 14 0.000173432
+tls_aes128gcm_6 14 0.000861645
+tls_isap_6 0 0
+ecdh 10 0
+tls_record_layer 1 0.0399899
+tls_handshake 0 0
+task2_custom 14 0.000670501
+---
+tls_isap_1
+tls_isap_2
+tls_isap_3
+tls_isap_4
+tls_isap_5
+tls_isap_6
+ecdh
+tls_handshake

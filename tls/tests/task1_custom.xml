@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:41</datetime>
+  <suite>
+    <title>Student Task 1 Tests</title>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>task1_custom.cpp:94</fn>
+      <id>nounce_test_1</id>
+      <iteration>0</iteration>
+      <duration>0.057254</duration>
+      <description>Nonce test</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>task1_custom.cpp:118</fn>
+      <id>nounce_test_2</id>
+      <iteration>0</iteration>
+      <duration>0.000243</duration>
+      <description>Nonce test</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>task1_custom.cpp:134</fn>
+      <id>hmac_test1</id>
+      <iteration>0</iteration>
+      <duration>0.000139</duration>
+      <description>Hmac test</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:15</fn>
+      <id>ascon_test1</id>
+      <iteration>0</iteration>
+      <duration>0.000072</duration>
+      <description>Ascon test</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:15</fn>
+      <id>aes_gcm_test1</id>
+      <iteration>0</iteration>
+      <duration>0.000438</duration>
+      <description>Aes gcm test</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:15</fn>
+      <id>hkdf_test1</id>
+      <iteration>0</iteration>
+      <duration>0.000056</duration>
+      <description>Hkdf test</description>
+      <message>Passed</message>
+    </test>
+  </suite>
+  <duration>0.100445</duration>
+</testsuites>

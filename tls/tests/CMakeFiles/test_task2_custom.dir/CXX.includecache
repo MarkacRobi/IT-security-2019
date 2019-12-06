@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/its2019/its2019g25/tls/tests/task2_custom.cpp
+../../utils/tests.h
+/home/its2019/its2019g25/utils/tests.h
+check.h
+-
+
+/home/its2019/its2019g25/utils/tests.h
+string
+-
+vector
+-
+utils.h
+/home/its2019/its2019g25/utils/utils.h
+check.h
+-
+
+/home/its2019/its2019g25/utils/utils.h
+array
+-
+boost/io/ios_state.hpp
+-
+iomanip
+-
+iostream
+-
+sstream
+-
+vector
+-
+

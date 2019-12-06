@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:40</datetime>
+  <suite>
+    <title>HKDF</title>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>short_input</id>
+      <iteration>0</iteration>
+      <duration>0.000114</duration>
+      <description>RFC 5869</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>long_input</id>
+      <iteration>0</iteration>
+      <duration>0.000117</duration>
+      <description>RFC 5869</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>zero_input</id>
+      <iteration>0</iteration>
+      <duration>0.000100</duration>
+      <description>RFC 5869</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>expand_label</id>
+      <iteration>0</iteration>
+      <duration>0.000108</duration>
+      <description>TLS</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>derive_secret</id>
+      <iteration>0</iteration>
+      <duration>0.000101</duration>
+      <description>TLS</description>
+      <message>Passed</message>
+    </test>
+  </suite>
+  <duration>0.003514</duration>
+</testsuites>

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://check.sourceforge.net/xml/check_unittest.xslt"?>
+<testsuites xmlns="http://check.sourceforge.net/ns">
+  <datetime>2019-12-05 17:03:40</datetime>
+  <suite>
+    <title>AES-GCM</title>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>encrypt_decrypt</id>
+      <iteration>0</iteration>
+      <duration>0.000407</duration>
+      <description>Functionality</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>encrypt_decrypt_ad</id>
+      <iteration>0</iteration>
+      <duration>0.000908</duration>
+      <description>Functionality</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>aesgcm.cpp:92</fn>
+      <id>encrypt_decrypt_distinct</id>
+      <iteration>0</iteration>
+      <duration>0.000368</duration>
+      <description>Functionality</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests</path>
+      <fn>aesgcm.cpp:117</fn>
+      <id>encrypt_decrypt_fail</id>
+      <iteration>0</iteration>
+      <duration>0.000665</duration>
+      <description>Functionality</description>
+      <message>Passed</message>
+    </test>
+    <test result="success">
+      <path>/home/its2019/its2019g25/tls/tests/../../utils</path>
+      <fn>tests.h:23</fn>
+      <id>encrypt_2_2_1</id>
+      <iteration>0</iteration>
+      <duration>0.000561</duration>
+      <description>Test vectors</description>
+      <message>Passed</message>
+    </test>
+  </suite>
+  <duration>0.004503</duration>
+</testsuites>

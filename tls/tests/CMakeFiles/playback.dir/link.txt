@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC  -Wall -fdiagnostics-color=auto -Wextra -pedantic -Werror=vla -Werror=implicit-function-declaration -pthread -O2 -g -DNDEBUG  -shared -Wl,-soname,libplayback.so -o libplayback.so CMakeFiles/playback.dir/playback.cpp.o -Wl,-rpath,/home/its2019/its2019g25/utils ../../utils/libutils.so /usr/lib/x86_64-linux-gnu/libboost_system.so 
