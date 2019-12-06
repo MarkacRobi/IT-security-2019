@@ -159,20 +159,20 @@ bool tls_record_layer::write_alert(AlertDescription alert)
   return ret;
 }
 
-bool tls_record_layer::setupAndInit(content_type type, const std::vector<uint8_t>& fragment,tls13_cipher::record& record )	
-	{	
-	  size_t sizeOfFragment = fragment.size();	
-	    record.header.type = type;	
-		
-	    record.header.version = TLSv1_2;	
-		
-	    	
-	    record.header.length = sizeOfFragment;	
-	    	
-	    	
-	    record.ciphertext = fragment;	
-		
-	    return true;	
+bool tls_record_layer::setupAndInit(content_type type, const std::vector<uint8_t>& fragment,tls13_cipher::record& record )
+	{
+	  size_t sizeOfFragment = fragment.size();
+	    record.header.type = type;
+
+	    record.header.version = TLSv1_2;
+
+
+	    record.header.length = sizeOfFragment;
+
+
+	    record.ciphertext = fragment;
+
+	    return true;
 	}
 
 bool tls_record_layer::encrypt(content_type type, const std::vector<uint8_t>& fragment,
@@ -183,13 +183,13 @@ bool tls_record_layer::encrypt(content_type type, const std::vector<uint8_t>& fr
   if(current_write_state.cipher == nullptr)
   {
     bool retVal = setupAndInit(type, fragment, record);
-    
+
     return retVal;
   }
   else
   {
     record = current_write_state.cipher->encrypt(type, fragment);
-    
+
     return true;
   }
 }
@@ -206,10 +206,10 @@ bool tls_record_layer::decrypt(const tls13_cipher::record& record, std::vector<u
 
     type = record.header.type;
 
-    
-    
+
+
     return true;
-   
+
   }
   else
   {
@@ -345,24 +345,24 @@ std::vector<uint8_t> tls_record_layer::compute_early_secrets(const std::vector<u
 
   hkdf vec_HKdF(digested_vector, psk);
 
-   derived_secret_key = vec_HKdF.derive_secret("derived", 
+   derived_secret_key = vec_HKdF.derive_secret("derived",
   {
 
   });
 
-     hkdf vec_HKdF2(vec_HKdF.derive_secret("ext binder", 
+     hkdf vec_HKdF2(vec_HKdF.derive_secret("ext binder",
   {
 
   }));
 
- key_for_binding = vec_HKdF2.expand_label("finished", 
+ key_for_binding = vec_HKdF2.expand_label("finished",
   {
 
   },
    hmac_sha2::digest_size);
   return derived_secret_key;
 
-  
+
 }
 
 std::vector<uint8_t>
@@ -373,25 +373,25 @@ tls_record_layer::compute_handshake_traffic_keys(const std::vector<uint8_t>& dhe
   handshake_traffic_key_ = vec_HKdF.derive_secret("derived", {
 
   });
- 
+
 
 
   client_handshake_traffic_secret_ = vec_HKdF.derive_secret("c hs traffic", messages);
 
-  server_handshake_traffic_secret_ = vec_HKdF.derive_secret("s hs traffic", messages); 
+  server_handshake_traffic_secret_ = vec_HKdF.derive_secret("s hs traffic", messages);
 
   typedef basic_ae<16, 16>::key_storage storage;
     storage client_key;
 
   hkdf server_hkdf(server_handshake_traffic_secret_);
-  
-  
-  hkdf client_hkdf(client_handshake_traffic_secret_); 
+
+
+  hkdf client_hkdf(client_handshake_traffic_secret_);
   std::vector<uint8_t> exp_label_vec;
   exp_label_vec = server_hkdf.expand_label("key",
    {
 
-  }, security_params.key_length); 
+  }, security_params.key_length);
 
 
   basic_ae<16, 16>::key_storage held_on_S_key;
@@ -409,7 +409,7 @@ tls_record_layer::compute_handshake_traffic_keys(const std::vector<uint8_t>& dhe
   std::vector<uint8_t> ivFromServer_vec = server_hkdf.expand_label("iv"
   , {
 
-  }, 
+  },
   security_params.iv_length);
   exp_label_vec = client_hkdf.expand_label("key"
   , {
@@ -435,53 +435,64 @@ tls_record_layer::compute_handshake_traffic_keys(const std::vector<uint8_t>& dhe
 
   if(security_params.entity == connection_end::SERVER)
   {
-    
+
 
     if(security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::AESGCM)
     {
       pending_read_state.cipher.reset
-      (new tls13_aesgcm(client_key, 
+      (new tls13_aesgcm(client_key,
       iv_clientSide_vec));
 
       pending_write_state.cipher.reset
-      (new tls13_aesgcm(held_on_S_key, 
+      (new tls13_aesgcm(held_on_S_key,
       ivFromServer_vec));
 
-     
-    } 
+
+    }
     else if
     (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ASCON)
     {
        pending_read_state.cipher.reset
-       (new tls13_ascon(client_key, 
+       (new tls13_ascon(client_key,
        iv_clientSide_vec));
 
       pending_write_state.cipher.reset
       (new tls13_ascon(held_on_S_key,
        ivFromServer_vec));
     }
+    else if
+            (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ISAP)
+    {
+        pending_read_state.cipher.reset
+                (new tls13_isap(client_key,
+                                 iv_clientSide_vec));
 
-   
+        pending_write_state.cipher.reset
+                (new tls13_isap(held_on_S_key,
+                                 ivFromServer_vec));
+    }
+
+
   }
-  
+
     else if(security_params.entity == connection_end::CLIENT)
   {
-   
+
       if(security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::AESGCM)
     {
         pending_write_state.cipher.reset
-      (new tls13_aesgcm(client_key, 
+      (new tls13_aesgcm(client_key,
       iv_clientSide_vec));
 
 
       pending_read_state.cipher.reset
       (new tls13_aesgcm(held_on_S_key,
        ivFromServer_vec));
-    } 
+    }
     else if
     (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ASCON)
     {
-      
+
       pending_write_state.cipher.reset
       (new tls13_ascon(client_key,
        iv_clientSide_vec));
@@ -491,9 +502,22 @@ tls_record_layer::compute_handshake_traffic_keys(const std::vector<uint8_t>& dhe
        ivFromServer_vec));
 
     }
+      else if
+              (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ISAP)
+      {
+
+          pending_write_state.cipher.reset
+                  (new tls13_isap(client_key,
+                                   iv_clientSide_vec));
+
+          pending_read_state.cipher.reset
+                  (new tls13_isap(held_on_S_key,
+                                   ivFromServer_vec));
+
+      }
   }
 
-  
+
   return handshake_traffic_key_;
 }
 
@@ -503,22 +527,22 @@ void tls_record_layer::compute_application_traffic_keys(const std::vector<uint8_
   hkdf vec_HKdF(handshake_traffic_key_, zeros);
 
   client_handshake_traffic_secret_ = vec_HKdF.derive_secret("c ap traffic", messages);
-  
 
-  server_handshake_traffic_secret_ = vec_HKdF.derive_secret("s ap traffic", messages); 
+
+  server_handshake_traffic_secret_ = vec_HKdF.derive_secret("s ap traffic", messages);
 
   typedef basic_ae<16, 16>::key_storage storage;
     storage client_key;
 
   hkdf server_hkdf(server_handshake_traffic_secret_);
-  
-  
-  hkdf client_hkdf(client_handshake_traffic_secret_); 
+
+
+  hkdf client_hkdf(client_handshake_traffic_secret_);
   std::vector<uint8_t> exp_label_vec;
   exp_label_vec = server_hkdf.expand_label("key",
    {
 
-  }, security_params.key_length); 
+  }, security_params.key_length);
 
 
   basic_ae<16, 16>::key_storage held_on_S_key;
@@ -537,7 +561,7 @@ void tls_record_layer::compute_application_traffic_keys(const std::vector<uint8_
   std::vector<uint8_t> ivFromServer_vec = server_hkdf.expand_label("iv"
   , {
 
-  }, 
+  },
   security_params.iv_length);
   exp_label_vec = client_hkdf.expand_label("key"
   , {
@@ -564,52 +588,63 @@ void tls_record_layer::compute_application_traffic_keys(const std::vector<uint8_
 
   if(security_params.entity == connection_end::SERVER)
   {
-    
+
 
     if(security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::AESGCM)
     {
       pending_read_state.cipher.
-      reset(new tls13_aesgcm(client_key, 
+      reset(new tls13_aesgcm(client_key,
       iv_clientSide_vec));
 
       pending_write_state.cipher.reset
-      (new tls13_aesgcm(held_on_S_key, 
+      (new tls13_aesgcm(held_on_S_key,
       ivFromServer_vec));
 
-     
-    } 
+
+    }
     else if
     (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ASCON)
     {
        pending_read_state.cipher.reset
-       (new tls13_ascon(client_key, 
+       (new tls13_ascon(client_key,
        iv_clientSide_vec));
 
       pending_write_state.cipher.reset
       (new tls13_ascon(held_on_S_key,
        ivFromServer_vec));
     }
+    else if
+            (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ISAP)
+    {
+        pending_read_state.cipher.reset
+                (new tls13_isap(client_key,
+                                 iv_clientSide_vec));
 
-   
+        pending_write_state.cipher.reset
+                (new tls13_isap(held_on_S_key,
+                                 ivFromServer_vec));
+    }
+
+
   }
-  
+
   else if(security_params.entity == connection_end::CLIENT)
   {
-   
+
     if(security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::AESGCM)
     {
       pending_write_state.cipher.
-      reset(new tls13_aesgcm(client_key, 
+      reset(new tls13_aesgcm(client_key,
       iv_clientSide_vec));
 
       pending_read_state.cipher.
       reset(new tls13_aesgcm(held_on_S_key,
        ivFromServer_vec));
-    } 
+    }
     else if
     (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ASCON)
     {
-      
+
       pending_write_state.cipher.
       reset(new tls13_ascon(client_key,
        iv_clientSide_vec));
@@ -617,6 +652,19 @@ void tls_record_layer::compute_application_traffic_keys(const std::vector<uint8_
       pending_read_state.cipher.
       reset(new tls13_ascon(held_on_S_key,
        ivFromServer_vec));
+
+    }
+    else if
+            (security_params.bulk_cipher == security_parameters::bulk_cipher_algorithm::ISAP)
+    {
+
+        pending_write_state.cipher.
+                reset(new tls13_isap(client_key,
+                                      iv_clientSide_vec));
+
+        pending_read_state.cipher.
+                reset(new tls13_isap(held_on_S_key,
+                                      ivFromServer_vec));
 
     }
   }
@@ -639,11 +687,11 @@ std::vector<uint8_t> tls_record_layer::get_finished_key(connection_end end)
     hkdf vec_HKdF(client_handshake_traffic_secret_);
     finalKey = vec_HKdF.expand_label("finished", {
 
-    }, 
+    },
     hmac_sha2::digest_size);
-  
+
   }
-  
+
   return finalKey;
 }
 
