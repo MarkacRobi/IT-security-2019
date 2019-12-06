@@ -39,14 +39,14 @@ std::vector<uint8_t> ecdh::get_data() const
   data.push_back(hton((uint8_t) 4 ));
 
   for(size_t i = 0; i < 8; i++) {
-      for(int j = 3; j >= 0; j--) {
-          data.push_back((public_key_.x[i] >> (j * 8u) & 0xff));
+      for(size_t j = 3; j >= 0; j--) {
+          data.push_back(((public_key_.x[i] >> (j * 8)) & 0xff));
       }
   }
 
     for(size_t i = 0; i < 8; i++) {
-        for(int j = 3; j >= 0; j--) {
-            data.push_back((public_key_.y[i] >> (j * 8u) & 0xff));
+        for(size_t j = 3; j >= 0; j--) {
+            data.push_back(((public_key_.y[i] >> (j * 8)) & 0xff));
         }
     }
 
@@ -55,35 +55,28 @@ std::vector<uint8_t> ecdh::get_data() const
 
 std::vector<uint8_t> ecdh::get_shared_secret(const std::vector<uint8_t>& other_party_data) const
 {
-    /// Decode second public key and run phase 2 of ECDH. Return the shared secret.
-    eccp_point_affine_t shared2;
-    vector<uint8_t> data;
-    eccp_point_affine_t other_party_data2;
-    int nr = 0;
+  /// Decode second public key and run phase 2 of ECDH. Return the shared secret.
+  eccp_point_affine_t shared2;
+  vector<uint8_t> data;
+  eccp_point_affine_t other_party_data2;
+  int nr = 0;
 
-    for(size_t i = 0; i < 8; i++) {
+  for(size_t i = 0; i < 8; i++) {
       nr = (int) other_party_data.at((i * 4) + 1) << 24;
       nr += (int) other_party_data.at((i * 4) + 2) << 16;
       nr += (int) other_party_data.at((i * 4) + 3) << 8;
-      nr += (int) other_party_data.at((i * 4) + 4);
+      nr += (int) other_party_data.at((i * 4) + 4) << 0;
       other_party_data2.x[i] = nr;
-    }
+      other_party_data2.y[i - 8] = nr;
+  }
 
-    for(size_t i = 8; i < 16; i++){
-        nr= (int) other_party_data.at((i * 4) + 1) << 24;
-        nr += (int) other_party_data.at((i * 4) + 2) << 16;
-        nr += (int) other_party_data.at((i * 4) + 3) << 8;
-        nr += (int) other_party_data.at((i * 4) + 4);
-        other_party_data2.y[i - 8] = nr;
-    }
-
-    ecdh_phase_two(&shared2, private_key_, &other_party_data2, &param_);
+  ecdh_phase_two(&shared2, private_key_, &other_party_data2, &param_);
 
     for(size_t i = 0; i < 8; i++) {
-        for(int j = 3; j >= 0; j--) {
-            data.push_back((shared2.x[i] >> (j * 8) & 0xff));
+        for(size_t j = 3; j >= 0; j--) {
+            data.push_back(((shared2.x[i] >> (j * 8)) & 0xff));
         }
     }
 
-    return data;
+  return data;
 }
