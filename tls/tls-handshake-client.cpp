@@ -504,7 +504,9 @@ alert_location tls_handshake_client::read_server_hello()
   {
     if (cipher_suite_to_select != TLS_AES_128_GCM_SHA256)
     {
-      return {local, handshake_failure}; 
+        if (cipher_suite_to_select != TLS_ISAP_128_SHA256) {
+            return {local, handshake_failure};
+        }
     }
   }
 

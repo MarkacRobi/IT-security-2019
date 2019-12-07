@@ -167,7 +167,7 @@ alert_location tls_handshake_server::read_client_hello()
         cipher_suite_selected.type[1] = clientPayload.at(i  + 38);
         cipher_suite_selected.type[0] = clientPayload.at(i  + 37);
 
-        if(cipher_suite_selected != TLS_ASCON_128_SHA256 && cipher_suite_selected != TLS_AES_128_GCM_SHA256)
+        if(cipher_suite_selected != TLS_ASCON_128_SHA256 && cipher_suite_selected != TLS_AES_128_GCM_SHA256 && cipher_suite_selected != TLS_ISAP_128_SHA256)
             return {local, handshake_failure};
 
         cipher_suites_vector.push_back(cipher_suite_selected);
@@ -350,7 +350,6 @@ void tls_handshake_server::send_server_hello()
     setExtenesionSize(sharedKeyPre.data.size() + 3 + 1);
 
     serverHelloMessage.extensions.push_back(sharedKey);
-
 
     serverHelloMessage.extensions.push_back(versionSupported);
     serverHelloMessage.extensions.push_back(sharedKeyPre);
