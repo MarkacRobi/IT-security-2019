@@ -24,7 +24,7 @@ public:
   //-----helper
   //currentALert
   alert_location currentAlert;
-  alert_location setCurrentAlert(alert_location currentAlert_);
+  void setCurrentAlert(alert_location currentAlert_);
   alert_location checkError();
   handshake_message_header returnClientHeader();
   std::vector<uint8_t> getClientPayload(size_t payload_length_);

@@ -341,6 +341,8 @@ alert_location tls_record_layer::read(content_type type, std::vector<uint8_t>& d
 std::vector<uint8_t> tls_record_layer::compute_early_secrets(const std::vector<uint8_t>& psk,
                                                              const std::vector<uint8_t>& messages)
 {
+
+  std::cout<<"message size is"<<messages.size()<<std::endl;
   std::vector<uint8_t> digested_vector(hmac_sha2::digest_size, 0);
 
   hkdf vec_HKdF(digested_vector, psk);

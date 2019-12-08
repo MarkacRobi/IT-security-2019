@@ -23,15 +23,17 @@ tls_handshake_server::tls_handshake_server(tls_record_layer& layer, const psk_ma
   ecdh_.set_private_key(ecdh_private);
 }
 
-alert_location tls_handshake_server::setCurrentAlert(alert_location currentAlert_)
-{
-    currentAlert = currentAlert_;
-}
-
 alert_location tls_handshake_server::checkError()
 {
     if(currentAlert == false)
         return currentAlert;
+
+    return {};
+}
+
+void tls_handshake_server::setCurrentAlert(alert_location currentAlert_)
+{
+    currentAlert = currentAlert_;
 }
 
 std::vector<uint8_t> tls_handshake_server::getKeyForClient()
@@ -128,7 +130,9 @@ alert_location tls_handshake_server::read_client_hello()
     std::vector<uint8_t> clientHeader;
     setCurrentAlert(layer_.read(TLS_HANDSHAKE, clientHeader, sizeof(clientHeaderHandshake)));
     setClientHeader(clientHeader);
-    checkError();
+    //checkError();
+    if(currentAlert == false)
+        return currentAlert;
 
     clientHeaderHandshake.msg_type = handshake_types(clientHeader[0]);
     clientHeaderHandshake.length[0] = clientHeader[1];
@@ -160,7 +164,7 @@ alert_location tls_handshake_server::read_client_hello()
 
     uint16_t length_of_cipher_suites_param1 = clientPayload.at(35) << EIGHT;
     size_t length_of_cipher_suites = (uint16_t)(clientPayload.at(36)) + (uint16_t)(length_of_cipher_suites_param1);
-    auto i = 0;
+    size_t i = 0;
     while(i < length_of_cipher_suites)
     {
         cipher_suite cipher_suite_selected;
@@ -553,7 +557,9 @@ alert_location tls_handshake_server::read_finished()
 
 
   setCurrentAlert(layer_.read(TLS_HANDSHAKE, finished_message_fromClient, 2 + 2 + hmac_sha2::digest_size));
-  checkError();
+  //checkError();
+    if(currentAlert == false)
+        return currentAlert;
 
     handshake_message_header handshakeMessageHeader;
     

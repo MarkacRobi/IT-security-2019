@@ -27,7 +27,7 @@ std::vector<uint8_t> tls13_ascon::addAdditionalData(record record_for_ciph_txt, 
   uint16_t sizeWithBuffer = sizeOfBuffer;
   sizeWithBuffer += BUFFER;
 
-  uint8_t length[2] = { sizeWithBuffer & 0xff, sizeWithBuffer >> 8 };
+  uint8_t length[2] = { (uint8_t)(sizeWithBuffer & 0xff), (uint8_t)(sizeWithBuffer >> 8) };
   std::vector<uint8_t> data;
   data.push_back(record_for_ciph_txt.header.type);
 
@@ -50,7 +50,7 @@ tls13_ascon::record tls13_ascon::encrypt(content_type type, const std::vector<ui
     }
     plaintext_buffer_holder.push_back((uint8_t) type);
 
-    int powTo = std::pow(POWTWO, FTEEN);
+    size_t powTo = std::pow(POWTWO, FTEEN);
 
     bool sizeOfL = sizeOfPT >= powTo;
     if (sizeOfL) {

@@ -56,11 +56,8 @@ record_.header.type = TLS_APPLICATION_DATA;
 
   if(testing)
     return record_;
-    else
-    {
-      /////
-    }
-
+  else
+      return record_;
 }
 
 bool tls13_aesgcm::decrypt(const record& record, std::vector<uint8_t>& plaintext,

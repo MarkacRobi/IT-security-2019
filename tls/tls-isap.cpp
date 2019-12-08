@@ -27,7 +27,7 @@ std::vector<uint8_t> tls13_isap::addAdditionalData(record record_for_ciph_txt, s
     uint16_t sizeWithBuffer = sizeOfBuffer;
     sizeWithBuffer += BUFFER;
 
-    uint8_t length[2] = { sizeWithBuffer & 0xff, sizeWithBuffer >> 8 };
+    uint8_t length[2] = { (uint8_t)(sizeWithBuffer & 0xff), (uint8_t)(sizeWithBuffer >> 8) };
     std::vector<uint8_t> data;
     data.push_back(record_for_ciph_txt.header.type);
 
@@ -53,7 +53,7 @@ tls13_isap::record tls13_isap::encrypt(content_type type, const std::vector<uint
     }
     plaintext_buffer_holder.push_back((uint8_t) type);
 
-    int powTo = std::pow(POWTWO, FTEEN);
+    size_t powTo = std::pow(POWTWO, FTEEN);
 
     bool sizeOfL = sizeOfPT >= powTo;
     if (sizeOfL) {
