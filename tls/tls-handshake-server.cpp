@@ -439,28 +439,7 @@ std::vector<uint8_t > tls_handshake_server::vectorForSending()
 void tls_handshake_server::send_finished()
 {
 /// \todo write the Finished message to the record layer
-    /*layer_.update_read_key();
-    layer_.update_write_key();
-    layer_.compute_handshake_traffic_keys(ecdh_.get_shared_secret(keyForClient), serverMessagesVector);
-    layer_.set_cipher_suite(selected_cipher_suite);
 
-    std::vector<uint8_t > vector_for_sending = vectorForSending();
-
-    sha2 hash_client;
-
-    hash_client.update(&serverMessagesVector[0], serverMessagesVector.size());
-
-
-    std::vector<uint8_t> keyFinished = layer_.get_finished_key(connection_end::SERVER);
-    hmac_sha2 HMAC_SHA2(&keyFinished[0], keyFinished.size());
-    HMAC_SHA2.update(hash_client.digest().data(), hash_client.digest().size());
-
-    for(size_t i = 0; i < HMAC_SHA2.digest().size(); i++)
-    {
-        vector_for_sending.push_back(HMAC_SHA2.digest()[i]);//TODO check
-    }
-
-    serverMessagesVector.insert(serverMessagesVector.end(), vector_for_sending.begin(), vector_for_sending.end());*/
   layer_.set_cipher_suite(selected_cipher_suite);
 
   layer_.compute_handshake_traffic_keys(ecdh_.get_shared_secret(keyForClient), serverMessagesVector);
@@ -502,56 +481,6 @@ size_t tls_handshake_server::getLengthForClientHash(handshake_message_header han
 alert_location tls_handshake_server::read_finished()
 {
   /// \todo read the Finished message from the record layer and handle it
-
-  /*std::vector<uint8_t> finished_message_fromClient;
-   alert_location alert = layer_.read(TLS_HANDSHAKE, finished_message_fromClient, 2 + 2 + hmac_sha2::digest_size);
-
-  if(!alert)
-    return alert;
-
-  handshake_message_header handshakeMessageHeader;
-  handshakeMessageHeader.msg_type = handshake_types (finished_message_fromClient[0]);
-  handshakeMessageHeader.length[0] = finished_message_fromClient[1];
-  handshakeMessageHeader.length[1] = finished_message_fromClient[2];
-  handshakeMessageHeader.length[2] = finished_message_fromClient[3];
-  
-  
-  if(handshake_types::FINISHED != handshakeMessageHeader.msg_type)
-  {
-
-      return {local, unexpected_message};
-  }
-
-  std::vector<uint8_t> hash_for_client;
-  hash_for_client.resize(getLengthForClientHash(handshakeMessageHeader));//TODO provjeri jel treba resize
-  std::memcpy(&hash_for_client[0], &finished_message_fromClient[2 +2], getLengthForClientHash(handshakeMessageHeader));
-  
-  sha2 hash_for_server;
-  hash_for_server.update(&serverMessagesVector[0], serverMessagesVector.size());
-  hmac_sha2::digest_storage dig = hash_for_server.digest();
-
-  std::vector<uint8_t> keyFinishedVector = layer_.get_finished_key(connection_end::CLIENT);
-
-  hmac_sha2 hmacSha2(&keyFinishedVector[0], keyFinishedVector.size());
-  hmacSha2.update(dig.data(), dig.size());
-
-  auto h1 = hmacSha2.digest();
-
-  std::vector<uint8_t> hash;
-  hash.resize(h1.size);//TODO check resize
-  std::memcpy(&hash[0], &h1[0], h1.size());
-  if(hash != hash_for_client)
-  {
-
-      return {local, decrypt_error};
-  }
-  layer_.compute_application_traffic_keys(serverMessagesVector);
-  layer_.update_read_key();
-  layer_.update_write_key();
-  
-
-  serverMessagesVector.insert(serverMessagesVector.end(), finished_message_fromClient.begin(), finished_message_fromClient.end());
-  return {local, ok};*/
 
   std::vector<uint8_t> finished_message_fromClient;
 
