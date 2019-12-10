@@ -2,7 +2,6 @@
 // Compile with g++ -std=c++0x -g -O2 -march=native -mtune=native <...> -lcrypto
 
 #include "BigInteger.h"
-#include <openssl/evp.h> // For AES
 #include <math.h>
 #include <sstream>
 #include <iomanip>

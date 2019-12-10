@@ -5,7 +5,6 @@
 
 #include "types.h"
 #include <iostream>
-#include <openssl/rand.h> // For RAND_bytes(.)
 #include <sstream>
 #include <iomanip>
 
