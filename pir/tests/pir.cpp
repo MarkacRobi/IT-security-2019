@@ -2,18 +2,18 @@
 #include "../pir_client.h"
 #include "../pir_server.h"
 #include "../../utils/tests.h"
+#include <fstream>
 #include <check.h>
 
 START_TEST(createQuery)
 {
   uchar seed[16] = "pir_client_test";
   Random::Init(seed);
-
-  // in practice desired privacy of 1 is not a good config, but faster to test :)
-  pir_client client(2, 1, 10);
+  
+  pir_client client(2, 1, 10);  
   client.setUpClient();
   const auto queries = client.clientQuery(3);
-
+  
   const auto ref_1 = BigInteger2048::FromFile(SOURCE_DIR "data/pir_client_query_1.txt");
   const auto ref_2 = BigInteger2048::FromFile(SOURCE_DIR "data/pir_client_query_2.txt");
 
@@ -34,8 +34,7 @@ START_TEST(clientFinish)
 {
   uchar seed[16] = "pir_client_test";
   Random::Init(seed);
-
-  // in practice desired privacy of 1 is not a good config, but faster to test :)
+  
   pir_client client(2, 1, 10);
   client.setUpClient();
   client.clientQuery(3);
@@ -44,9 +43,9 @@ START_TEST(clientFinish)
   const auto server_response_2 = BigInteger2048::FromFile(SOURCE_DIR "data/pir_server_response_2.txt");
   std::vector<std::vector<BigInteger2048>> responses = {server_response_1, server_response_2};
   const auto ref = BigInteger1024::FromFile(SOURCE_DIR "data/pir_client_result.txt");
-
+  
   const auto result = client.clientFinish(responses);
-
+  
   ck_assert_int_eq(result.size(), ref.size());
   for(size_t i = 0; i < ref.size(); i++)
   {
@@ -75,6 +74,19 @@ END_TEST
 START_TEST(executeProtocol)
 {
   utils::executeProtocol(2, 1 ,10, 0, "result.jpg");
+  
+  std::ifstream result("result.jpg", std::ios::binary);
+  std::ifstream reference(SOURCE_DIR "../database/img0.jpg", std::ios::binary);
+  
+  char cres, cref;
+  
+  while(reference.get(cres))
+  {
+    ck_assert_int_eq((bool)result.get(cref), true);
+    ck_assert_int_eq(cref, cres);
+  }
+  
+  ck_assert_int_eq(reference.eof(), true);
 }
 END_TEST
 
@@ -92,12 +104,12 @@ int main(int argc, char** argv)
   tcase_set_timeout(tcase, 120);
   tcase_add_test(tcase, serverResponse);
   suite_add_tcase(suite, tcase);
-
+  
   tcase = tcase_create("execute protocol");
   tcase_set_timeout(tcase, 240);
   tcase_add_test(tcase, executeProtocol);
   suite_add_tcase(suite, tcase);
-
+  
   SRunner* suite_runner = srunner_create(suite);
   srunner_run(suite_runner, argc, argv);
   int number_failed = srunner_ntests_failed(suite_runner);
