@@ -164,7 +164,7 @@ START_TEST(add)
     const auto& a = as.at(i);
     const auto& b = bs.at(i);
     BigInteger2048 c;
-    BigInteger::AddIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024 + 1), NUM_WORDS_1024);
+    BigInteger::AddIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
         
     ck_assert_bi_eq(c, sums.at(i));
   }
@@ -183,7 +183,7 @@ START_TEST(subtract)
     const auto& a = as.at(i);
     const auto& b = bs.at(i);
     BigInteger2048 c;
-    BigInteger::SubtractIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024 + 1), NUM_WORDS_1024);
+    BigInteger::SubtractIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
         
     ck_assert_bi_eq(c, diffs.at(i));
   }

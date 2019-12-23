@@ -36,27 +36,31 @@ namespace
   }
 
   inline void ck_assert_bi_eq(const BigInteger1024& lhs, const BigInteger1024& rhs){
-    for(int i = 0; i < NUM_WORDS_1024; i++){
-      ck_assert_int_eq((word)lhs.GetData()[i], (word)rhs.GetData()[i]);
+    for(int i = 0; i < NUM_BYTES_1024; i++){
+      ck_assert_int_eq(lhs.GetData()[i], rhs.GetData()[i]);
     }
   }
 
   inline void ck_assert_bi_ne(BigInteger1024& lhs, const BigInteger1024& rhs){
-    for(int i = 0; i < NUM_WORDS_1024; i++){
-      ck_assert_int_ne((word)lhs.GetData()[i], (word)rhs.GetData()[i]);
+    for(int i = 0; i < NUM_BYTES_1024; i++){
+      if(lhs.GetData()[i] != rhs.GetData()[i])
+        return;
     }
+    ck_abort_msg("Assertion failed: BigInteger1024 != BigInteger1024");
   }
 
   inline void ck_assert_bi_eq(const BigInteger2048& lhs, const BigInteger2048& rhs){
-    for(int i = 0; i < NUM_WORDS_2048; i++){
-      ck_assert_int_eq((word)lhs.GetData()[i], (word)rhs.GetData()[i]);
+    for(int i = 0; i < NUM_BYTES_2048; i++){
+      ck_assert_int_eq(lhs.GetData()[i], rhs.GetData()[i]);
     }
   }
 
   inline void ck_assert_bi_ne(BigInteger2048& lhs, const BigInteger2048& rhs){
-    for(int i = 0; i < NUM_WORDS_2048; i++){
-      ck_assert_int_ne((word)lhs.GetData()[i], (word)rhs.GetData()[i]);
+    for(int i = 0; i < NUM_BYTES_2048; i++){
+      if(lhs.GetData()[i] != rhs.GetData()[i])
+        return;
     }
+    ck_abort_msg("Assertion failed: BigInteger2048 != BigInteger2048");
   }
 
   inline void srunner_run(SRunner* sr, int argc, char** argv)
