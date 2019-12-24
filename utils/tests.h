@@ -6,6 +6,8 @@
 
 #include "utils.h"
 #include <check.h>
+#include "../pir/bigint/BigInteger1024.h"
+#include "../pir/bigint/BigInteger2048.h"
 
 namespace
 {
@@ -31,6 +33,34 @@ namespace
     const std::string s1{util::to_hex_string(c1)};
     const std::string s2{util::to_hex_string(c2)};
     ck_assert_str_split_eq(s1, s2);
+  }
+
+  inline void ck_assert_bi_eq(const BigInteger1024& lhs, const BigInteger1024& rhs){
+    for(int i = 0; i < NUM_BYTES_1024; i++){
+      ck_assert_int_eq(lhs.GetData()[i], rhs.GetData()[i]);
+    }
+  }
+
+  inline void ck_assert_bi_ne(BigInteger1024& lhs, const BigInteger1024& rhs){
+    for(int i = 0; i < NUM_BYTES_1024; i++){
+      if(lhs.GetData()[i] != rhs.GetData()[i])
+        return;
+    }
+    ck_abort_msg("Assertion failed: BigInteger1024 != BigInteger1024");
+  }
+
+  inline void ck_assert_bi_eq(const BigInteger2048& lhs, const BigInteger2048& rhs){
+    for(int i = 0; i < NUM_BYTES_2048; i++){
+      ck_assert_int_eq(lhs.GetData()[i], rhs.GetData()[i]);
+    }
+  }
+
+  inline void ck_assert_bi_ne(BigInteger2048& lhs, const BigInteger2048& rhs){
+    for(int i = 0; i < NUM_BYTES_2048; i++){
+      if(lhs.GetData()[i] != rhs.GetData()[i])
+        return;
+    }
+    ck_abort_msg("Assertion failed: BigInteger2048 != BigInteger2048");
   }
 
   inline void srunner_run(SRunner* sr, int argc, char** argv)
