@@ -71,7 +71,7 @@ void BigInteger::AddIntegers(word* c, word* a, word* b, word* carry, uint32 num_
       c[i] = convertToHexa(temp);
   }
 
-  if(*carry== 1 || c >= (*word)primes::m.GetData())
+  if(*carry== 1 || c >= (word*)primes::m.GetData())
   {
       *c = c - (word*)primes::m.GetData();
   }
