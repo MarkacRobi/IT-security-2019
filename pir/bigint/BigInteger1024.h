@@ -10,7 +10,7 @@
 #include <vector>
 
 // TODO: Find suitable value
-#define NUM_WORDS_1024 1
+#define NUM_WORDS_1024 64
 #define NUM_BYTES_1024 128
 
 class BigInteger1024

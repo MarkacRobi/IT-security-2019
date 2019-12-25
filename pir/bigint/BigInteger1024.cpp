@@ -52,6 +52,8 @@ BigInteger1024::BigInteger1024(const BigInteger1024& bigint) {
 }
 
 BigInteger1024::BigInteger1024(const std::string hex_string){
+
+    printf(" size is %d\n", NUM_BYTES_1024);
   this->num_bytes_ = NUM_BYTES_1024;
   this->data_ = new uchar[NUM_BYTES_1024];
   this->modulus_ = new uchar[NUM_BYTES_1024];
@@ -93,8 +95,19 @@ BigInteger1024::BigInteger1024(const std::string hex_string){
     ss >> current;
     size_t index = (NUM_WORDS_1024 - 1) - i;
 
+    //printf("current is %x\n", current);
     data[index] = current;
   }
+    printf("broj je\n");
+    for(size_t i = 0; i < 128; i++)
+    {
+    printf("%x", this->GetData()[i]);
+
+    }
+    printf("\nispod\n");
+    printf("\n");
+
+    //printf("size is: %d\n", sizeof(this->GetData()));
 }
 
 BigInteger1024::~BigInteger1024() {
@@ -151,6 +164,7 @@ BigInteger1024 BigInteger1024::Inverse(const BigInteger1024& a) {
 }
 
 std::vector<BigInteger1024> BigInteger1024::FromFile(const std::string &filename) {
+    //std::cout<<"unutra sam" << std::endl;
   std::string line;
   std::ifstream file;
   file.open(filename);
