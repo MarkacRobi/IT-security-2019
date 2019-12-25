@@ -9,6 +9,6 @@
   typedef unsigned char uchar;
   // TODO: Change to suitable values
   typedef uint16 word;
-  typedef uint16 doubleword;
+  typedef uint32 doubleword;
 
 #endif
