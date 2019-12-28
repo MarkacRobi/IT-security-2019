@@ -10,7 +10,7 @@
 #include "BigInteger1024.h"
 
 // TODO: Find suitable value
-#define NUM_WORDS_2048 1
+#define NUM_WORDS_2048 128
 #define NUM_BYTES_2048 256
 
 class BigInteger2048

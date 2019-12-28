@@ -53,7 +53,6 @@ BigInteger1024::BigInteger1024(const BigInteger1024& bigint) {
 
 BigInteger1024::BigInteger1024(const std::string hex_string){
 
-    printf(" size is %d\n", NUM_BYTES_1024);
   this->num_bytes_ = NUM_BYTES_1024;
   this->data_ = new uchar[NUM_BYTES_1024];
   this->modulus_ = new uchar[NUM_BYTES_1024];
@@ -86,28 +85,25 @@ BigInteger1024::BigInteger1024(const std::string hex_string){
   if(hex_string.size() / 2 != NUM_BYTES_1024)
     throw std::invalid_argument("String must represent a 1024-bit integer!");
 
+
   for(size_t i = 0; i < NUM_WORDS_1024; i++){
     ss.clear();
 
+    //printf("position1 is: %d\n", i * sizeof(word) * 2);
+      //printf("position is: %d\n", sizeof(word) * 2);
     ss << std::hex << std::setfill('0') << std::setw(2) << hex_string.substr(i * sizeof(word) * 2, sizeof(word) * 2);
 
     word current;
     ss >> current;
     size_t index = (NUM_WORDS_1024 - 1) - i;
-
-    //printf("current is %x\n", current);
     data[index] = current;
   }
-    printf("broj je\n");
-    for(size_t i = 0; i < 128; i++)
-    {
-    printf("%x", this->GetData()[i]);
-
-    }
-    printf("\nispod\n");
-    printf("\n");
-
-    //printf("size is: %d\n", sizeof(this->GetData()));
+//
+//  printf("data is \n");
+//  for(size_t i = 0; i < 128; i++)
+//      printf("%x", this->GetData()[i]);
+//
+//  printf("\n");
 }
 
 BigInteger1024::~BigInteger1024() {

@@ -99,6 +99,8 @@ BigInteger2048::BigInteger2048(const BigInteger1024& bigint) {
 }
 
 BigInteger2048::BigInteger2048(const std::string hex_string){
+
+    //std::cout << "hex is " << hex_string <<std::endl;
   this->num_bytes_ = NUM_BYTES_2048;
   this->data_ = new uchar[NUM_BYTES_2048];
   this->modulus_ = new uchar[NUM_BYTES_2048];
@@ -147,17 +149,27 @@ BigInteger2048::BigInteger2048(const std::string hex_string){
   if(hex_string.size() / 2 != NUM_BYTES_2048)
     throw std::invalid_argument("String must represent a 2048 bit integer!");
 
+  //printf("%d\n", NUM_WORDS_2048);
   for(size_t i = 0; i < NUM_WORDS_2048; i++){
     ss.clear();
 
+    //printf("%d %d\n", i * sizeof(word) * 2, sizeof(word) * 2);
+    //std::cout << hex_string.substr(i * sizeof(word) * 2, sizeof(word) * 2) << std::endl;
     ss << std::hex << std::setfill('0') << std::setw(2) << hex_string.substr(i * sizeof(word) * 2, sizeof(word) * 2);
 
     word current;
     ss >> current;
     size_t index = (NUM_WORDS_2048 - 1) - i;
 
+    //printf("%x\n", current);
     data[index] = current;
   }
+
+//     printf("data is \n");
+// for(size_t i = 0; i < 256; i++)
+//    printf("%x", this->GetData()[i]);
+
+  printf("\n");
 }
 
 BigInteger2048::BigInteger2048(const BigInteger2048& bigint) {
