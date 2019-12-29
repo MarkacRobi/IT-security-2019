@@ -181,11 +181,11 @@ void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint3
 //    }
 //    printf("\n");
 
-    if(*borrow == 1)
+    /*if(*borrow == 1)
     {
         printf("uso sam\n");
         AddIntegers(c, c, (word*)primes::m.GetData(), borrow, num_words_operands * 2);
-    }
+    }*/
 
 
 }
