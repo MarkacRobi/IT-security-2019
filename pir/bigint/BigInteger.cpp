@@ -174,15 +174,19 @@ void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint3
 
     }
 
-    printf("primes is: ");
-    for(size_t i = 0; i < 128; i++)
-    {
-        printf("%x", (word*)primes::m.GetData()[i]);
-    }
-    printf("\n");
+//    printf("primes is: ");
+//    for(size_t i = 0; i < 128; i++)
+//    {
+//        printf("%x", (word*)primes::m.GetData()[i]);
+//    }
+//    printf("\n");
 
-//    if(*borrow == 1)
-//        AddIntegers(c, c, (word*)primes::m.GetData(), borrow, num_words_operands);
+    if(*borrow == 1)
+    {
+        printf("uso sam\n");
+        AddIntegers(c, c, (word*)primes::m.GetData(), borrow, num_words_operands * 2);
+    }
+
 
 }
 
@@ -197,10 +201,73 @@ void BigInteger::KaratsubaOfman(word* c, word* a, word* b, uint32 num_words_oper
 
 bool BigInteger::SmallerThan(word* a, word* b, uint32 num_words_a, uint32 num_words_b) {
   // TODO: To implement
+    int i;
+    if(num_words_a == num_words_b)
+    {
+        i = num_words_a -1;
+    }
+    else if(num_words_a < num_words_b)
+    {
+        i = num_words_b -1;
+    }
+    else if(num_words_a > num_words_b)
+    {
+        i = num_words_a -1;
+    }
+
+    for(; i >= 0; i--)
+    {
+        //printf("a je %x\n", a[i]);
+        //printf("b je %x\n", b[i]);
+        if(a[i] < b[i])
+        {
+            printf("vece je\n");
+            return true;
+        }
+        else if(a[i] > b[i])
+        {
+            printf("manje je\n");
+            return false;
+        }
+
+    }
   return false;
 }
 
 bool BigInteger::GreaterThan(word* a, word* b, uint32 num_words_a, uint32 num_words_b) {
   // TODO: To implement
+  //printf("%x\n", a[0]);
+
+  int i;
+  if(num_words_a == num_words_b)
+  {
+      i = num_words_a -1;
+  }
+  else if(num_words_a < num_words_b)
+  {
+      i = num_words_b -1;
+  }
+  else if(num_words_a > num_words_b)
+  {
+      i = num_words_a -1;
+  }
+
+  for(; i >= 0; i--)
+  {
+      //printf("a je %x\n", a[i]);
+      //printf("b je %x\n", b[i]);
+      if(a[i] > b[i])
+      {
+          printf("vece je\n");
+          return true;
+      }
+      else if(a[i] < b[i])
+      {
+          printf("manje je\n");
+          return false;
+      }
+
+  }
+
   return false;
 }
