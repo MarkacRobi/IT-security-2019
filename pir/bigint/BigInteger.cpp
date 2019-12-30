@@ -114,6 +114,7 @@ void BigInteger::AddIntegers(word* c, word* a, word* b, word* carry, uint32 num_
     // TODO: To implement
 
     int temp_result = 0;
+    //printf("%x\n", BigInteger1024::GetModulus()[0]);
     *carry = 0;
 
     temp_result = a[0] + b[0];
@@ -163,7 +164,7 @@ void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint3
 
     *borrow = 0;
 
-    int temp_result = a[0] - b[0];;
+    int temp_result = a[0] - b[0];
     if(temp_result < 0)
     {
         printf("negativno je\n");
@@ -210,6 +211,42 @@ void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint3
 
 void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_operands) {
   // TODO: To implement
+  int carry = 0; // u
+  unsigned int i = 0;
+  unsigned int j = 0;
+  int current_number = 0;
+
+  for(i = 0; i < num_words_operands - 1; i++)
+  {
+      c[i] = 0x0;
+  }
+  for(i = 0; i < num_words_operands - 1; i++)
+  {
+      carry = 0;
+      for(j = 0; j < num_words_operands - 1; j++)
+      {
+          current_number = c[i+j] + (a[i] * b[j]) + carry;
+          if(current_number > 0xFFFF)
+          {
+              carry = 1;
+              current_number -= 65535;
+          }
+          else
+          {
+              carry = 0;
+          }
+          //carry = current_number/10;
+          //c[i+j] = current_number%10;
+          c[i+j] = current_number;
+      }
+      /*if (carry) {
+          //current_number = c[i+j] + carry;
+          //carry = current_number/16;
+          //c[i+j] = current_number%16;
+          c[i+j] += carry;
+      }*/
+      c[num_words_operands + i] = carry;
+  }
 }
 
 void BigInteger::KaratsubaOfman(word* c, word* a, word* b, uint32 num_words_operands) {
