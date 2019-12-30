@@ -151,7 +151,6 @@ void BigInteger::AddIntegers(word* c, word* a, word* b, word* carry, uint32 num_
 //        print_word(c, NUM_WORDS_2048);
 //
 //    }
-    print_word(c, NUM_WORDS_2048);
 }
 
 void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint32 num_words_operands) {
@@ -167,7 +166,6 @@ void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint3
     int temp_result = a[0] - b[0];
     if(temp_result < 0)
     {
-        printf("negativno je\n");
         temp_result += 0x10000;
         *borrow = 1;
 
@@ -216,28 +214,22 @@ void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_op
   unsigned int j = 0;
   int current_number = 0;
 
-  for(i = 0; i < num_words_operands - 1; i++)
+  for(i = 0; i <= num_words_operands - 1; i++)
   {
       c[i] = 0x0;
   }
-  for(i = 0; i < num_words_operands - 1; i++)
+  for(i = 0; i <= num_words_operands - 1; i++)
   {
       carry = 0;
-      for(j = 0; j < num_words_operands - 1; j++)
+      for(j = 0; j <= num_words_operands - 1; j++)
       {
           current_number = c[i+j] + (a[i] * b[j]) + carry;
-          if(current_number > 0xFFFF)
-          {
-              carry = 1;
-              current_number -= 65535;
-          }
-          else
-          {
-              carry = 0;
-          }
-          //carry = current_number/10;
-          //c[i+j] = current_number%10;
-          c[i+j] = current_number;
+          carry = current_number/(0xFFFF + 1);
+          current_number -= 0xFFFF + 1;
+
+//          carry = current_number/(0xFFFF + 1);
+//          c[i+j] = current_number%(num_words_operands);
+          c[i+j] = current_number%(0xFFFF + 1);
       }
       /*if (carry) {
           //current_number = c[i+j] + carry;
@@ -247,6 +239,7 @@ void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_op
       }*/
       c[num_words_operands + i] = carry;
   }
+  print_word(c, NUM_WORDS_2048);
 }
 
 void BigInteger::KaratsubaOfman(word* c, word* a, word* b, uint32 num_words_operands) {
@@ -276,12 +269,10 @@ bool BigInteger::SmallerThan(word* a, word* b, uint32 num_words_a, uint32 num_wo
         //printf("b je %x\n", b[i]);
         if(a[i] < b[i])
         {
-            printf("vece je\n");
             return true;
         }
         else if(a[i] > b[i])
         {
-            printf("manje je\n");
             return false;
         }
 
@@ -313,12 +304,10 @@ bool BigInteger::GreaterThan(word* a, word* b, uint32 num_words_a, uint32 num_wo
       //printf("b je %x\n", b[i]);
       if(a[i] > b[i])
       {
-          printf("vece je\n");
           return true;
       }
       else if(a[i] < b[i])
       {
-          printf("manje je\n");
           return false;
       }
 
