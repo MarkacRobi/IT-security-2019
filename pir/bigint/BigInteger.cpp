@@ -96,6 +96,18 @@ int changeOrder(int num)
 
  }
 
+ void print_word(word* c, uint32 num_words_operands) {
+    printf("Printing word c: \n");
+     for (size_t i = 0; i <= num_words_operands - 1; i++) {
+//         printf("%u|", (unsigned int)c[i]);
+            std::cout << std::hex << static_cast<int>(c[i]);
+     }
+//        stream  << std::hex << c;
+//        std::cout << stream.str();
+        printf("\n");
+
+}
+
 
 
 void BigInteger::AddIntegers(word* c, word* a, word* b, word* carry, uint32 num_words_operands) {
@@ -128,11 +140,17 @@ void BigInteger::AddIntegers(word* c, word* a, word* b, word* carry, uint32 num_
 
     }
 
-    /*if(*carry== 1 || c >= (word*)primes::m.GetData())
-    {
-        *c = c - (word*)primes::m.GetData();
-    }*/
-
+//    print_word(c, num_words_operands);
+//    print_word((word*)primes::m.GetData(), NUM_WORDS_1024);
+//
+//    if(*carry== 1 ||   SmallerThan((word*)primes::m.GetData(), c, NUM_WORDS_1024, NUM_WORDS_2048))
+//    {
+//        *c = c - (word*)primes::m.GetData();
+//        printf("Po odstevanju: \n");
+//        print_word(c, NUM_WORDS_2048);
+//
+//    }
+    print_word(c, NUM_WORDS_2048);
 }
 
 void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint32 num_words_operands) {
