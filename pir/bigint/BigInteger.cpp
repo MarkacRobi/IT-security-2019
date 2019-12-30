@@ -117,10 +117,10 @@ void BigInteger::AddIntegers(word* c, word* a, word* b, word* carry, uint32 num_
     *carry = 0;
 
     temp_result = a[0] + b[0];
-    if(temp_result > 65535)
+    if(temp_result > 0xFFFF)
     {
         *carry = 1;
-        temp_result -= 65535;
+        temp_result -= 0xFFFF + 1;
     }
     c[0] = temp_result;
 
@@ -131,7 +131,7 @@ void BigInteger::AddIntegers(word* c, word* a, word* b, word* carry, uint32 num_
         if(temp_result > 0xFFFF)
         {
             *carry = 1;
-            temp_result -= 65536;
+            temp_result -= 0xFFFF + 1;
         } else{
             *carry = 0;
         }
