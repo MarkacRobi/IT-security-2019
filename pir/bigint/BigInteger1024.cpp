@@ -100,7 +100,7 @@ BigInteger1024::BigInteger1024(const std::string hex_string){
   }
 //
 //  printf("data is \n");
-//  for(size_t i = 0; i < 128; i++)
+//  for(size_t i = 0; i < 16; i++)
 //      printf("%x", this->GetData()[i]);
 //
 //  printf("\n");
@@ -135,7 +135,10 @@ uint32 BigInteger1024::GetNumBytes() const {
 
 BigInteger1024 operator+(const BigInteger1024& a, const BigInteger1024& b) {
   // TODO: To implement
-  return BigInteger1024(0);
+  BigInteger1024  c;
+  BigInteger::AddIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024), 100);
+
+  return c;
 }
 
 BigInteger1024 operator-(const BigInteger1024& a, const BigInteger1024& b) {
