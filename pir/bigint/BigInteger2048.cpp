@@ -219,12 +219,38 @@ BigInteger2048 operator-(const BigInteger2048& a, const BigInteger2048& b) {
 
 BigInteger2048 operator*(const BigInteger2048& a, const BigInteger2048& b) {
   // TODO: To implement
+    for(int i=0; i<256; i++)
+    {
+        printf("%x\n", a.GetData()[i]);
+    }
   return BigInteger2048(0);
 }
 
 BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
   // TODO: To implement
-  return BigInteger1024(0);
+  std::string result;
+  int index = 0;
+  BigInteger2048 prvi = BigInteger2048(a);
+  BigInteger2048 dijeli = BigInteger2048(b);
+  while(dijeli.GetData()[index] <= prvi.GetData()[index])
+  {
+      dijeli.GetData()[index] = dijeli.GetData()[index] << 1;
+      index++;
+  }
+  while(index > 0)
+  {
+      dijeli.GetData()[index] = dijeli.GetData()[index] << 1;
+      result[index] = result[index] << 1;
+      //shift result by 1
+      if(dijeli.GetData()[index] <= prvi.GetData()[index])
+      {
+          prvi.GetData()[index] = prvi.GetData()[index] - dijeli.GetData()[index];
+          result[0] = result[0] + 1;
+      }
+      index--;
+  }
+  //printf("%s\n", result);
+  return BigInteger1024(result);
 }
 
 
@@ -248,3 +274,4 @@ std::vector<BigInteger2048> BigInteger2048::FromFile(const std::string &filename
   file.close();
   return result;
 }
+
