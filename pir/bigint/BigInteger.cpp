@@ -207,39 +207,41 @@ void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint3
 
 }
 
+
+
 void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_operands) {
-  // TODO: To implement
-  int carry = 0; // u
-  unsigned int i = 0;
-  unsigned int j = 0;
-  int current_number = 0;
+    // TODO: To implement
+    int carry = 0; // u
+    unsigned int i = 0;
+    unsigned int j = 0;
+    int current_number = 0;
 
-  for(i = 0; i <= num_words_operands - 1; i++)
-  {
-      c[i] = 0x0;
-  }
-  for(i = 0; i <= num_words_operands - 1; i++)
-  {
-      carry = 0;
-      for(j = 0; j <= num_words_operands - 1; j++)
-      {
-          current_number = c[i+j] + (a[i] * b[j]) + carry;
-          carry = current_number/(0xFFFF + 1);
-          current_number -= 0xFFFF + 1;
-
-//          carry = current_number/(0xFFFF + 1);
-//          c[i+j] = current_number%(num_words_operands);
-          c[i+j] = current_number%(0xFFFF + 1);
-      }
-      /*if (carry) {
-          //current_number = c[i+j] + carry;
-          //carry = current_number/16;
-          //c[i+j] = current_number%16;
-          c[i+j] += carry;
-      }*/
-      c[num_words_operands + i] = carry;
-  }
-  print_word(c, NUM_WORDS_2048);
+    for(i = 0; i < num_words_operands - 1; i++)
+    {
+        c[i] = 0x0;
+    }
+    for(i = 0; i <= num_words_operands - 1; i++)
+    {
+        carry = 0;
+        for(j = 0; j <= num_words_operands - 1; j++)
+        {
+            current_number = c[i+j] + (a[i] * b[j]) + carry;
+            if (current_number > 0xFFFF)
+            {
+                carry = current_number/(0xFFFF + 1);
+                current_number -= 0xFFFF + 1;
+              //  carry = 1;
+               // current_number -= 65534;
+            }
+            else
+            {
+                carry = 0;
+            }
+            //c[i+j] = current_number%(0xFFFF + 1);
+            c[i+j] = current_number;
+        }
+        c[num_words_operands + i] = carry;
+    }
 }
 
 void BigInteger::KaratsubaOfman(word* c, word* a, word* b, uint32 num_words_operands) {
