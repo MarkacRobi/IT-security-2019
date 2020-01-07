@@ -2,6 +2,7 @@
 #include "bigint/BigInteger.h"
 #include <iostream>
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iomanip>
 #include "pir_client.h"
@@ -18,11 +19,17 @@ namespace utils{
         fileName.append(".jpg");
 
         std::ifstream file(fileName, std::ios::binary);
+        if(!file.is_open())
+          throw std::invalid_argument("File not opened");
+
         std::vector<BigInteger1024> fileData;
 
+        unsigned char buffer[127];
         for(uint16_t i = 0; i < blocksPerImage; i++){
-            unsigned char buffer[127];
             file.read((char*) buffer, 127);
+            long count = file.gcount();
+            if(count != 127L)
+              memset(buffer + count, 0, 127L - count);
             std::stringstream ss;
             for(unsigned char j : buffer)
                 ss << std::hex << std::setw(2) << std::setfill('0') << (int) j;

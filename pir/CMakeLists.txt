@@ -10,6 +10,8 @@ set(PRIMITIVES_SOURCES
     random.cpp
     ../tls/aes/aes128.cpp)
 
+add_definitions("-DDATABASE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/database/\"")
+
 add_library(pir_primitives SHARED ${PRIMITIVES_SOURCES})
 
 if(CXX_SUPPORTS_MAES)

@@ -15,7 +15,7 @@ class pir_server {
 private:
     uint8_t numImages;
     uint16_t blocksPerImage;
-    const std::vector<std::vector<BigInteger1024>> database = utils::getAllImages("../database/" ,numImages, blocksPerImage);
+    const std::vector<std::vector<BigInteger1024>> database = utils::getAllImages(DATABASE_DIR, numImages, blocksPerImage);
 
 public:
     pir_server(uint8_t nImages, uint16_t blockPerImg) : numImages(nImages), blocksPerImage(blockPerImg) {}
