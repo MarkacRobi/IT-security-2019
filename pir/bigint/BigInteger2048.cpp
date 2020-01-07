@@ -209,12 +209,37 @@ uint32 BigInteger2048::GetNumBytes() const {
 
 BigInteger2048 operator+(const BigInteger2048& a, const BigInteger2048& b) {
   // TODO: To implement
-  return BigInteger2048(0);
+    BigInteger2048  c;
+    BigInteger2048 modulus;
+    BigInteger::AddIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_2048), NUM_WORDS_2048);
+
+    word *carry = (word*)(c.GetData() + NUM_BYTES_2048);
+    if(*carry == 1
+       || BigInteger::GreaterThan((word*)c.GetData(), (word*)modulus.GetModulus(), NUM_WORDS_2048, NUM_WORDS_2048)
+       || ((BigInteger::GreaterThan((word*)c.GetData(), (word*)modulus.GetModulus(), NUM_WORDS_2048, NUM_WORDS_2048)) == false &&
+           (BigInteger::SmallerThan((word*)c.GetData(), (word*)modulus.GetModulus(), NUM_WORDS_2048, NUM_WORDS_2048)) == false))
+    {
+        printf("oduzmi sa modulus2048\n");
+        BigInteger::SubtractIntegers((word*)c.GetData(), (word*)c.GetData(), (word*)modulus.GetModulus(), (word*)(c.GetData() + NUM_BYTES_2048), NUM_WORDS_2048);
+    }
+
+    return c;
 }
 
 BigInteger2048 operator-(const BigInteger2048& a, const BigInteger2048& b) {
   // TODO: To implement
-  return BigInteger2048(0);
+    BigInteger2048  c;
+    BigInteger2048 modulus;
+    BigInteger::SubtractIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_2048), NUM_WORDS_2048);
+
+    word *borrow = (word*)(c.GetData() + NUM_BYTES_2048);
+    if(*borrow == 1)
+    {
+        printf("oduzmi sa modulus2048\n");
+        BigInteger::AddIntegers((word*)c.GetData(), (word*)c.GetData(), (word*)modulus.GetModulus(), (word*)(c.GetData() + NUM_BYTES_2048), NUM_WORDS_2048);
+    }
+
+    return c;
 }
 
 BigInteger2048 operator*(const BigInteger2048& a, const BigInteger2048& b) {
