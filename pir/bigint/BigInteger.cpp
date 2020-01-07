@@ -242,6 +242,7 @@ void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_op
         }
         c[num_words_operands + i] = carry;
     }
+
 }
 
 void BigInteger::KaratsubaOfman(word* c, word* a, word* b, uint32 num_words_operands) {
