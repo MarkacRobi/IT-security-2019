@@ -228,29 +228,32 @@ BigInteger2048 operator*(const BigInteger2048& a, const BigInteger2048& b) {
 
 BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
   // TODO: To implement
-  std::string result;
-  int index = 0;
-  BigInteger2048 prvi = BigInteger2048(a);
-  BigInteger2048 dijeli = BigInteger2048(b);
-  while(dijeli.GetData()[index] <= prvi.GetData()[index])
+  BigInteger1024 result = BigInteger1024(0);
+  long index = 0;
+ // BigInteger2048 prvi = BigInteger2048(a);
+  //BigInteger1024 dijeli = BigInteger1024(b);
+  while(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_1024)
+        || (!(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_1024)) &&
+            !(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_1024))))
   {
-      dijeli.GetData()[index] = dijeli.GetData()[index] << 1;
+      b.GetData()[index] = b.GetData()[index] << 1;
       index++;
   }
+  printf("%d\n", index);
   while(index > 0)
   {
-      dijeli.GetData()[index] = dijeli.GetData()[index] << 1;
-      result[index] = result[index] << 1;
-      //shift result by 1
-      if(dijeli.GetData()[index] <= prvi.GetData()[index])
+      b.GetData()[index] = b.GetData()[index] >> 1;
+      result.GetData()[index] = result.GetData()[index] << 1;
+      if(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_1024)
+         || (!(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_1024)) &&
+             !(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_1024))))
       {
-          prvi.GetData()[index] = prvi.GetData()[index] - dijeli.GetData()[index];
-          result[0] = result[0] + 1;
+          a.GetData()[index] = a.GetData()[index] - b.GetData()[index];
+          result.GetData()[0] = result.GetData()[0] + 1;
       }
       index--;
   }
-  //printf("%s\n", result);
-  return BigInteger1024(result);
+  return result;
 }
 
 
