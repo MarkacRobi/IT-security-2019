@@ -233,42 +233,64 @@ BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
   int index = 0;
   BigInteger2048 dividend_n = BigInteger2048(a);
   BigInteger1024 divisor_d = BigInteger1024(b);
-  while(BigInteger::SmallerThan((word*)divisor_d.GetData(), (word*)dividend_n.GetData(), NUM_WORDS_1024, NUM_WORDS_2048)
-        || (!(BigInteger::GreaterThan((word*)divisor_d.GetData(), (word*)dividend_n.GetData(), NUM_WORDS_2048, NUM_WORDS_1024)) &&
-            !(BigInteger::SmallerThan((word*)divisor_d.GetData(), (word*)dividend_n.GetData(), NUM_WORDS_2048, NUM_WORDS_1024))))//da li treba index vracat na pocetak ako ishiftam citav broj jednom
+  word shift_array[129];
+
+
+    memset(shift_array, 0, 129 * sizeof(word));
+    memcpy(shift_array, b.GetData(), NUM_BYTES_1024);
+
+
+  int carry = 0;
+  while(!BigInteger::GreaterThan((word*)shift_array, (word*)dividend_n.GetData(), NUM_WORDS_2048 + 1, NUM_WORDS_2048))
   {
-      /*printf("Result1 is: ");
-      for(int i=0; i<128; i++)
-          printf("%x", divisor_d.GetData()[i]);
-      printf("\n");*/
 
-      divisor_d.GetData()[index] = divisor_d.GetData()[index] << 1;//8b << 1 = 116 ---> on ignorise 1 i upise 16??
+      carry = 0;
+      for(int i = 0; i < 129; i++)
+      {
 
-     /* printf("Result2 is: ");
-      for(int i=0; i<128; i++)
-          printf("%x", divisor_d.GetData()[i]);
-      printf("\n");*/
-      printf("Index is %d\n", index);
+          uint32 temp_result = ( uint32 (shift_array[i])  << 1) +  carry;
+          carry = temp_result >> 16;
+          shift_array[i] = temp_result;
+      }
     index++;
+
   }
-/* printf("Result is: ");
-    for(int i=0; i<128; i++)
-    printf("%x", divisor_d.GetData()[index]);
-    printf("\n");*/
     printf("Index is %d\n", index);
+  int carry_;
   while(index > 0)
   {
-      printf("Index is %d\n", index);
-      divisor_d.GetData()[index] = divisor_d.GetData()[index] >> 1;
-      result.GetData()[index] = result.GetData()[index] << 1;
-      if(BigInteger::SmallerThan((word*)divisor_d.GetData(), (word*)dividend_n.GetData(), NUM_WORDS_1024, NUM_WORDS_2048))
+      carry = 0;
+      for(int i = 0; i < 129; i++)
       {
-          dividend_n.GetData()[index] = dividend_n.GetData()[index] - divisor_d.GetData()[index];
-          printf("kurcina %x\n", a.GetData()[index]);
-          result.GetData()[0] = result.GetData()[0] + 1;
+
+          uint32 temp_result = ( uint32 (shift_array[i])  >> 1) +  carry;
+          carry = temp_result << 16;
+          shift_array[i] = temp_result;
       }
-      index--;
+      carry_ = 0;
+
+      for(int i = 0; i < 128; i++)
+      {
+
+          uint32 temp_result_ = ( uint32 (result.GetData()[i])  << 1) +  carry_;
+          carry_ = temp_result_ >> 16;
+          result.GetData()[i] = temp_result_;
+      }
+
+
+    if(!BigInteger::GreaterThan((word*)shift_array, (word*)dividend_n.GetData(), NUM_WORDS_2048 + 1, NUM_WORDS_2048))
+    {
+        memset(divisor_d.GetData(), 0, 128 * sizeof(word));
+        memcpy(divisor_d.GetData(), shift_array, NUM_BYTES_1024);
+
+
+        dividend_n = dividend_n - divisor_d;
+        result.GetData()[0]= result.GetData()[0] + 1;
+    }
+    index--;
   }
+
+
   //printf("Result is: ");
   //for(int i=0; i<256; i++)
     //printf("%x", result.GetData()[index]);
