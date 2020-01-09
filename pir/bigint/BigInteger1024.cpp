@@ -5,6 +5,7 @@
 #include "BigInteger2048.h"
 #include "BigInteger.h"
 #include "../random.h"
+#include "../primes.h"
 #include <sstream>
 #include <iomanip>
 #include <cstring>
@@ -100,7 +101,7 @@ BigInteger1024::BigInteger1024(const std::string hex_string){
   }
 //
 //  printf("data is \n");
-//  for(size_t i = 0; i < 128; i++)
+//  for(size_t i = 0; i < 16; i++)
 //      printf("%x", this->GetData()[i]);
 //
 //  printf("\n");
@@ -135,16 +136,79 @@ uint32 BigInteger1024::GetNumBytes() const {
 
 BigInteger1024 operator+(const BigInteger1024& a, const BigInteger1024& b) {
   // TODO: To implement
-  return BigInteger1024(0);
+  BigInteger2048  c;
+  BigInteger::AddIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
+
+    word *carry = (word*)(c.GetData() + NUM_BYTES_1024);
+    if(*carry == 1
+       || BigInteger::GreaterThan((word*)c.GetData(), (word*)primes::m.GetModulus(), NUM_WORDS_1024, NUM_WORDS_1024)
+       || ((BigInteger::GreaterThan((word*)c.GetData(), (word*)primes::m.GetModulus(), NUM_WORDS_1024, NUM_WORDS_1024)) == false &&
+           (BigInteger::SmallerThan((word*)c.GetData(), (word*)primes::m.GetModulus(), NUM_WORDS_1024, NUM_WORDS_1024)) == false))
+    {
+        printf("oduzmi sa modulus1024\n");
+        BigInteger::SubtractIntegers((word*)c.GetData(), (word*)c.GetData(), (word*)primes::m.GetModulus(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
+    }
+
+
+  BigInteger1024 res;
+
+
+  for(int i = 0; i < NUM_BYTES_1024; i++)
+  {
+      res.GetData()[i] = c.GetData()[i];
+  }
+
+  return res;
 }
 
 BigInteger1024 operator-(const BigInteger1024& a, const BigInteger1024& b) {
   // TODO: To implement
-  return BigInteger1024(0);
+    BigInteger2048  c;
+    BigInteger::SubtractIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
+
+    word *borrow = (word*)(c.GetData() + NUM_BYTES_1024);
+    if(*borrow == 1)
+    {
+        printf("oduzmi sa modulus1024\n");
+        printf("%x\n", primes::m.GetModulus());
+        BigInteger::AddIntegers((word*)c.GetData(), (word*)c.GetData(), (word*)primes::m.GetModulus(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
+    }
+
+    BigInteger1024 res;
+
+    for(int i = 0; i < NUM_BYTES_1024; i++)
+    {
+        res.GetData()[i] = c.GetData()[i];
+    }
+
+    return res;
 }
 
 BigInteger1024 operator*(const BigInteger1024& a, const BigInteger1024& b) {
   // TODO: To implement
+  const std::string mu = ("0x107d4dc7c15d75295370e77aabf1c2ef0ff6deb6ea995a226c8dca38fd2e82e43ac54fa62085abf63d7798201ba124facbe4cb974dbaf72cd0e96863b79ce3af37d912421c2a18ae3b6215fbd0e5aa7459105a61e9804adb14aba3c966f20e8e36935db78cd08814cda1969510b0ed92dbd71d38b8aa5adbdf4742fb5157e1a17d5321ed548394c130496819943c2e90d4a74d73f38958232766a52309f2520b9194199bd80014a0c08d23a529d0f2a1fd933599301b8fb8941c52fa5701904c6039cab96f3e028554e3922f385eca64dc0e2a905682bd90f7b006fd23b5d057fcd6be7203d3f19d4d1733bba95ff5c9740044134e7c0c6ab510fc5abL");
+   BigInteger2048 x;
+    BigInteger1024 q;
+
+    BigInteger::MultiplyIntegers((word*)x.GetData(), (word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024);
+
+    BigInteger1024 new_x;
+    for(int i = 0; i < NUM_BYTES_1024; i++)
+    {
+        new_x.GetData()[i] = x.GetData()[i];
+    }
+
+    const std::string temp_b = "18446744073709551616"; //( 2 ^ 64)
+    BigInteger1024 B = BigInteger1024(std::string(246, '0').append(temp_b));
+     int number_of_times_to_shift = 4032;//log2(B)*(k-1)
+    for(int i=0; i<NUM_BYTES_1024; i++)
+    {
+        mempcpy(new_x[i], number_of_times_to_shift, 2);
+    }
+
+
+
+
   return BigInteger1024(0);
 }
 

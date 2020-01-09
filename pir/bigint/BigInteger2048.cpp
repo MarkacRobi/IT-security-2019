@@ -209,31 +209,59 @@ uint32 BigInteger2048::GetNumBytes() const {
 
 BigInteger2048 operator+(const BigInteger2048& a, const BigInteger2048& b) {
   // TODO: To implement
-  return BigInteger2048(0);
+    BigInteger2048  c;
+    BigInteger2048 modulus;
+    BigInteger::AddIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_2048), NUM_WORDS_2048);
+
+    word *carry = (word*)(c.GetData() + NUM_BYTES_2048);
+    if(*carry == 1
+       || BigInteger::GreaterThan((word*)c.GetData(), (word*)modulus.GetModulus(), NUM_WORDS_2048, NUM_WORDS_2048)
+       || ((BigInteger::GreaterThan((word*)c.GetData(), (word*)modulus.GetModulus(), NUM_WORDS_2048, NUM_WORDS_2048)) == false &&
+           (BigInteger::SmallerThan((word*)c.GetData(), (word*)modulus.GetModulus(), NUM_WORDS_2048, NUM_WORDS_2048)) == false))
+    {
+        printf("oduzmi sa modulus2048\n");
+        BigInteger::SubtractIntegers((word*)c.GetData(), (word*)c.GetData(), (word*)modulus.GetModulus(), (word*)(c.GetData() + NUM_BYTES_2048), NUM_WORDS_2048);
+    }
+
+    return c;
 }
 
 BigInteger2048 operator-(const BigInteger2048& a, const BigInteger2048& b) {
   // TODO: To implement
-  printf("stojca");
-  return BigInteger2048(0);
+    BigInteger2048  c;
+    BigInteger2048 modulus;
+    BigInteger::SubtractIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_2048), NUM_WORDS_2048);
+
+    word *borrow = (word*)(c.GetData() + NUM_BYTES_2048);
+    if(*borrow == 1)
+    {
+        printf("oduzmi sa modulus2048\n");
+        BigInteger::AddIntegers((word*)c.GetData(), (word*)c.GetData(), (word*)modulus.GetModulus(), (word*)(c.GetData() + NUM_BYTES_2048), NUM_WORDS_2048);
+    }
+
+    return c;
 }
 
 BigInteger2048 operator*(const BigInteger2048& a, const BigInteger2048& b) {
   // TODO: To implement
-    for(int i=0; i<256; i++)
-    {
-        printf("%x\n", a.GetData()[i]);
-    }
   return BigInteger2048(0);
 }
 
 BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
   // TODO: To implement
   BigInteger1024 result = BigInteger1024(0);
+
+  word result_array[128];
+    memset(result_array, 0, 128 * sizeof(word));
+
   int index = 0;
   BigInteger2048 dividend_n = BigInteger2048(a);
   BigInteger1024 divisor_d = BigInteger1024(b);
   word shift_array[129];
+  word div_array[129];
+  memset(div_array, 0, 129*sizeof(word));
+    memcpy(div_array, a.GetData(), NUM_BYTES_1024);
+
 
 
     memset(shift_array, 0, 129 * sizeof(word));
@@ -260,42 +288,40 @@ BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
   while(index > 0)
   {
       carry = 0;
+      for(int i = 128; i >= 0; i--)
+      {
+
+          carry = (shift_array[i] & 0x1) << 16;
+          uint32 temp_result = ( uint32 (shift_array[i])  >> 1) |  (carry<<15);
+          shift_array[i] = temp_result;
+      }
+
+      carry_ = 0;l
       for(int i = 0; i < 129; i++)
       {
 
-          uint32 temp_result = ( uint32 (shift_array[i])  >> 1) +  carry;
-          carry = temp_result << 16;
-          shift_array[i] = temp_result;
-      }
-      carry_ = 0;
-
-      for(int i = 0; i < 128; i++)
-      {
-
-          uint32 temp_result_ = ( uint32 (result.GetData()[i])  << 1) +  carry_;
+          uint32 temp_result_ = ( uint32 (result_array[i]) << 1) + carry_;
           carry_ = temp_result_ >> 16;
-          result.GetData()[i] = temp_result_;
+          result_array[i] = temp_result_;
       }
 
 
-    if(!BigInteger::GreaterThan((word*)shift_array, (word*)dividend_n.GetData(), NUM_WORDS_2048 + 1, NUM_WORDS_2048))
+    if(!BigInteger::GreaterThan((word*)shift_array, (word*)div_array, NUM_WORDS_2048 + 1, NUM_WORDS_2048))
     {
-        memset(divisor_d.GetData(), 0, 128 * sizeof(word));
-        memcpy(divisor_d.GetData(), shift_array, NUM_BYTES_1024);
 
-
-        dividend_n = dividend_n - divisor_d;
-        result.GetData()[0]= result.GetData()[0] + 1;
+        BigInteger::SubtractIntegers((word*)div_array, (word*)div_array, (word*)shift_array, (word*)(div_array + NUM_WORDS_1024), NUM_WORDS_1024);
+        result_array[0]= result_array[0] + 1;
     }
     index--;
   }
 
-
-  //printf("Result is: ");
-  //for(int i=0; i<256; i++)
-    //printf("%x", result.GetData()[index]);
-  //printf("\n");
-  return result;
+    BigInteger1024 temp;
+    memcpy(temp.GetData(), result_array, NUM_BYTES_1024);
+  printf("Result is: ");
+  for(int i=0; i<256; i++)
+    printf("%x", temp.GetData()[i]);
+  printf("\n");
+  return temp;
 }
 
 
@@ -319,4 +345,3 @@ std::vector<BigInteger2048> BigInteger2048::FromFile(const std::string &filename
   file.close();
   return result;
 }
-

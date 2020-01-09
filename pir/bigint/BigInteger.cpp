@@ -10,6 +10,8 @@
 #include <fstream>
 #include <algorithm>
 #include "../primes.h"
+#include "BigInteger2048.h"
+#define mu 0x179bd99a80d40c4a0164cefb86800433593888f1be00ea82365fdf2c5f3bbb8a387e0b507fc61db6ff99597781dafadc639d20eb82e6cf5d0aae5505b252e51c48458817e583e7a841836ad6bcc93a11ede1731e723df2e3bf18482b8959e54461c7cb693ac24b7097f524e1e068949020ec66df8400ceae571b7ccb64e562db6L
 
 int convertToDecimal(char num)
 {
@@ -113,110 +115,70 @@ int changeOrder(int num)
 void BigInteger::AddIntegers(word* c, word* a, word* b, word* carry, uint32 num_words_operands) {
     // TODO: To implement
 
-    int temp_result = 0;
-    //printf("%x\n", BigInteger1024::GetModulus()[0]);
-    *carry = 0;
+    uint32 temp_result = 0;
 
     temp_result = a[0] + b[0];
-    if(temp_result > 0xFFFF)
-    {
-        *carry = 1;
-        temp_result -= 0xFFFF + 1;
-    }
-    c[0] = temp_result;
+    c[0] = a[0] + b[0];
+    *carry = temp_result >> 16;
+
+    //printf("-<-<<-<-<-<-<--<-<-%x\n", temp_result);
 
     for (size_t i = 1; i <= num_words_operands - 1; i++) {
 
         temp_result = a[i] + b[i] + *carry;
-
-        if(temp_result > 0xFFFF)
-        {
-            *carry = 1;
-            temp_result -= 0xFFFF + 1;
-        } else{
-            *carry = 0;
-        }
-
-        c[i] = temp_result;
-
+        c[i] = a[i] + b[i] + *carry;
+        *carry = temp_result >> 16;
     }
 
-//    print_word(c, num_words_operands);
-//    print_word((word*)primes::m.GetData(), NUM_WORDS_1024);
-//
-//    if(*carry== 1 ||   SmallerThan((word*)primes::m.GetData(), c, NUM_WORDS_1024, NUM_WORDS_2048))
-//    {
-//        *c = c - (word*)primes::m.GetData();
-//        printf("Po odstevanju: \n");
-//        print_word(c, NUM_WORDS_2048);
-//
-//    }
+
 }
+
 
 void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint32 num_words_operands) {
   // TODO: To implement
 
-    //int jedan  = 0x0F2D;
-    //int dva = 0xA23C;
-    //printf("--->%x\n", jedan - dva);
-
-
-    *borrow = 0;
-
+    int borrow_ = 0;
     int temp_result = a[0] - b[0];
     if(temp_result < 0)
     {
+        //printf("negativno je\n");
         temp_result += 0x10000;
-        *borrow = 1;
+        borrow_ = 1;
 
     }
     //printf("---------------->%x\n", temp_result);
-
+    //printf("ispod if\n");
     c[0] = temp_result;
 
     for (size_t i = 1; i <= num_words_operands - 1; i++) {
 
-        temp_result = a[i] - b[i] - *borrow;
+        temp_result = a[i] - b[i] - borrow_;
 
         if(temp_result < 0)
         {
             temp_result += 0x10000;
-            *borrow = 1;
+            borrow_ = 1;
 
         } else{
-            *borrow = 0;
+            borrow_ = 0;
         }
 
         c[i] = temp_result;
 
     }
 
-//    printf("primes is: ");
-//    for(size_t i = 0; i < 128; i++)
-//    {
-//        printf("%x", (word*)primes::m.GetData()[i]);
-//    }
-//    printf("\n");
-
-    /*if(*borrow == 1)
-    {
-        printf("uso sam\n");
-        AddIntegers(c, c, (word*)primes::m.GetData(), borrow, num_words_operands * 2);
-    }*/
-
+    *borrow = borrow_;
 
 }
 
-
-
 void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_operands) {
     // TODO: To implement
-    int carry = 0; // u
+    uint32 carry = 0; // u
     unsigned int i = 0;
     unsigned int j = 0;
-    int current_number = 0;
+    uint64 current_number = 0;
 
-    for(i = 0; i < num_words_operands - 1; i++)
+    for(i = 0; i <= num_words_operands - 1; i++)
     {
         c[i] = 0x0;
     }
@@ -228,22 +190,25 @@ void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_op
             current_number = c[i+j] + (a[i] * b[j]) + carry;
             if (current_number > 0xFFFF)
             {
-                carry = current_number/(0xFFFF + 1);
-                current_number -= 0xFFFF + 1;
-              //  carry = 1;
-               // current_number -= 65534;
+                carry = current_number >> 16;
+                current_number -= 0x10000;
+
             }
             else
             {
                 carry = 0;
             }
-            //c[i+j] = current_number%(0xFFFF + 1);
+
             c[i+j] = current_number;
+            printf("temp iznad res na index %d je: %x\n", i+j,  c[j + i]);
         }
         c[num_words_operands + i] = carry;
+        printf("temp iznad res na index %d je: %x\n", i + num_words_operands,  c[i + num_words_operands]);
     }
 
 }
+
+
 
 void BigInteger::KaratsubaOfman(word* c, word* a, word* b, uint32 num_words_operands) {
   // TODO: To implement
@@ -272,10 +237,12 @@ bool BigInteger::SmallerThan(word* a, word* b, uint32 num_words_a, uint32 num_wo
         //printf("b je %x\n", b[i]);
         if(a[i] < b[i])
         {
+            //printf("vece je\n");
             return true;
         }
         else if(a[i] > b[i])
         {
+            //printf("manje je\n");
             return false;
         }
 
@@ -287,7 +254,25 @@ bool BigInteger::GreaterThan(word* a, word* b, uint32 num_words_a, uint32 num_wo
   // TODO: To implement
   //printf("%x\n", a[0]);
 
-  int i;
+//
+//            printf("a is: ");
+//    for(int i = 0; i < 128; i++)
+//    {
+//        printf("%x", a[i]);
+//    }
+//    printf("\n");
+//
+//    printf("b is: ");
+//    for(int i = 0; i < 128; i++)
+//    {
+//        printf("%x", b[i]);
+//    }
+//    printf("\n");
+
+
+
+
+    int i;
   if(num_words_a == num_words_b)
   {
       i = num_words_a -1;
@@ -307,10 +292,12 @@ bool BigInteger::GreaterThan(word* a, word* b, uint32 num_words_a, uint32 num_wo
       //printf("b je %x\n", b[i]);
       if(a[i] > b[i])
       {
+          //printf("vece je\n");
           return true;
       }
       else if(a[i] < b[i])
       {
+          //printf("manje je\n");
           return false;
       }
 
