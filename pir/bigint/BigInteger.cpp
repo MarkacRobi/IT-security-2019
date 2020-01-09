@@ -173,18 +173,18 @@ void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint3
 
 void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_operands) {
     // TODO: To implement
-    int carry = 0; // u
+    uint32 carry = 0; // u
     unsigned int i = 0;
     unsigned int j = 0;
-    uint32 current_number = 0;
-    const std::string k = ("179bd99a80d40c4a0164cefb86800433593888f1be00ea82365fdf2c5f3bbb8a387e0b507fc61db6ff99597781da");
-    const std::string u = ("0xfadc639d20eb82e6cf5d0aae5505b252e51c48458817e583e7a841836ad6bcc93a11ede1731e723df2e3bf18482b8959e54461c7cb693ac24b7097f524e1e068949020ec66df8400ceae571b7ccb64e562db6L");
-    BigInteger2048 ke = BigInteger2048(std::string(260, '0').append(k).append(u));
-    const std::string test = std::string(260, '0').append(k).append(u);
+    uint64 current_number = 0;
+   // const std::string k = ("179bd99a80d40c4a0164cefb86800433593888f1be00ea82365fdf2c5f3bbb8a387e0b507fc61db6ff99597781da");
+    //const std::string u = ("0xfadc639d20eb82e6cf5d0aae5505b252e51c48458817e583e7a841836ad6bcc93a11ede1731e723df2e3bf18482b8959e54461c7cb693ac24b7097f524e1e068949020ec66df8400ceae571b7ccb64e562db6L");
+    //BigInteger2048 ke = BigInteger2048(std::string(260, '0').append(k).append(u));
+    //const std::string test = std::string(260, '0').append(k).append(u);
 
 
-    const BigInteger2048 m = BigInteger2048(ke);
-    std::cout<<test;
+   // const BigInteger2048 m = BigInteger2048(ke);
+    //std::cout<<test;
 
     for(i = 0; i <= num_words_operands - 1; i++)
     {
@@ -198,19 +198,20 @@ void BigInteger::MultiplyIntegers(word* c, word* a, word* b, uint32 num_words_op
             current_number = c[i+j] + (a[i] * b[j]) + carry;
             if (current_number > 0xFFFF)
             {
-                carry = current_number/(0xFFFF + 1);
-                current_number -= 0xFFFF + 1;
-                //  carry = 1;
-                // current_number -= 65534;
+                carry = current_number >> 16;
+                current_number -= 0x10000;
+
             }
             else
             {
                 carry = 0;
             }
-            //c[i+j] = current_number%(0xFFFF + 1);
+
             c[i+j] = current_number;
+            printf("temp iznad res na index %d je: %x\n", i+j,  c[j + i]);
         }
         c[num_words_operands + i] = carry;
+        printf("temp iznad res na index %d je: %x\n", i + num_words_operands,  c[i + num_words_operands]);
     }
 
 }
