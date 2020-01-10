@@ -123,6 +123,7 @@ int main(int argc, char** argv)
     tcase_add_test(tcase, single_encrypt);
     tcase_add_test(tcase, random_element_consistency);
     tcase_add_test(tcase, random_encrypt);
+    tcase_set_timeout(tcase, 120);
     suite_add_tcase(suite, tcase);
 
 

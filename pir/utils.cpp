@@ -1,5 +1,9 @@
 #include "utils.h"
+#ifdef PROTOCOLS
+#include "bigint_ref/BigInteger.h"
+#else
 #include "bigint/BigInteger.h"
+#endif
 #include <iostream>
 #include <cstdlib>
 #include <cstring>

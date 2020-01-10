@@ -1,9 +1,13 @@
 #ifndef PAILLIER_H
 #define PAILLIER_H
 
+#ifdef PROTOCOLS
+#include "bigint_ref/BigInteger1024.h"
+#include "bigint_ref/BigInteger2048.h"
+#else
 #include "bigint/BigInteger1024.h"
 #include "bigint/BigInteger2048.h"
-
+#endif
 
 class paillier{
 public:

@@ -1,7 +1,13 @@
 #include"../../utils/tests.h"
-#include"../bigint/BigInteger2048.h"
-#include"../bigint/BigInteger1024.h"
-#include"../bigint/BigInteger.h"
+#ifdef PROTOCOLS
+#include "../bigint_ref/BigInteger1024.h"
+#include "../bigint_ref/BigInteger2048.h"
+#include "../bigint_ref/BigInteger.h"
+#else
+#include "../bigint/BigInteger1024.h"
+#include "../bigint/BigInteger2048.h"
+#include "../bigint/BigInteger.h"
+#endif
 
 #include<check.h>
 #include<cstdlib>
@@ -12,7 +18,7 @@ START_TEST(addition2048)
   auto as = BigInteger2048::FromFile(SOURCE_DIR "data/as.txt");
   auto bs = BigInteger2048::FromFile(SOURCE_DIR "data/bs.txt");
   auto cs = BigInteger2048::FromFile(SOURCE_DIR "data/sums_mod.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = as[i] + (bs[i] + BigInteger2048(0) + BigInteger2048(0));
@@ -27,7 +33,7 @@ START_TEST(subtraction2048)
   auto as = BigInteger2048::FromFile(SOURCE_DIR "data/as.txt");
   auto bs = BigInteger2048::FromFile(SOURCE_DIR "data/bs.txt");
   auto cs = BigInteger2048::FromFile(SOURCE_DIR "data/diffs_mod.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = as[i] - (bs[i] + BigInteger2048(0) + BigInteger2048(0));
@@ -42,7 +48,7 @@ START_TEST(multiplication2048)
   auto as = BigInteger2048::FromFile(SOURCE_DIR "data/as.txt");
   auto bs = BigInteger2048::FromFile(SOURCE_DIR "data/bs.txt");
   auto cs = BigInteger2048::FromFile(SOURCE_DIR "data/cs.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = as[i] * bs[i];
@@ -56,7 +62,7 @@ START_TEST(powermod2048)
   auto as = BigInteger2048::FromFile(SOURCE_DIR "data/as.txt");
   auto bs = BigInteger2048::FromFile(SOURCE_DIR "data/bs.txt");
   auto es = BigInteger2048::FromFile(SOURCE_DIR "data/es.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = BigInteger2048::PowerMod(as[i], bs[i]);
@@ -70,7 +76,7 @@ START_TEST(division2048)
   auto xs = BigInteger2048::FromFile(SOURCE_DIR "data/xs.txt");
   auto ys = BigInteger1024::FromFile(SOURCE_DIR "data/ys.txt");
   auto refs = BigInteger1024::FromFile(SOURCE_DIR "data/quot.txt");
-  
+
   for(unsigned int i = 0; i < xs.size(); i++)
   {
     auto res = xs[i] / ys[i];
@@ -85,7 +91,7 @@ START_TEST(addition1024)
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
   auto cs = BigInteger1024::FromFile(SOURCE_DIR "data/sums_mod1024.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = as[i] + (bs[i] + BigInteger1024(0) + BigInteger1024(0));
@@ -100,7 +106,7 @@ START_TEST(subtraction1024)
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
   auto cs = BigInteger1024::FromFile(SOURCE_DIR "data/diffs_mod1024.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = as[i] - (bs[i] + BigInteger1024(0) + BigInteger1024(0));
@@ -114,7 +120,7 @@ START_TEST(multiplication1024)
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
   auto cs = BigInteger1024::FromFile(SOURCE_DIR "data/cs1024.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = as[i] * bs[i];
@@ -128,7 +134,7 @@ START_TEST(powermod1024)
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
   auto es = BigInteger1024::FromFile(SOURCE_DIR "data/es1024.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = BigInteger1024::PowerMod(as[i], bs[i]);
@@ -142,7 +148,7 @@ START_TEST(inverse1024)
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
   auto invs = BigInteger1024::FromFile(SOURCE_DIR "data/invs1024.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     auto res = BigInteger1024::Inverse(as[i]);
@@ -156,16 +162,16 @@ START_TEST(add)
 {
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
-  
+
   auto sums = BigInteger2048::FromFile(SOURCE_DIR "data/sums.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     const auto& a = as.at(i);
     const auto& b = bs.at(i);
     BigInteger2048 c;
     BigInteger::AddIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
-        
+
     ck_assert_bi_eq(c, sums.at(i));
   }
 }
@@ -175,16 +181,16 @@ START_TEST(subtract)
 {
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
-  
+
   auto diffs = BigInteger2048::FromFile(SOURCE_DIR "data/diffs.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     const auto& a = as.at(i);
     const auto& b = bs.at(i);
     BigInteger2048 c;
     BigInteger::SubtractIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
-        
+
     ck_assert_bi_eq(c, diffs.at(i));
   }
 }
@@ -194,16 +200,16 @@ START_TEST(multiply)
 {
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
-  
+
   auto prods = BigInteger2048::FromFile(SOURCE_DIR "data/prods.txt");
-  
+
   for(unsigned int i = 0; i < as.size(); i++)
   {
     const auto& a = as.at(i);
     const auto& b = bs.at(i);
     BigInteger2048 c;
     BigInteger::MultiplyIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024);
-        
+
     ck_assert_bi_eq(c, prods.at(i));
   }
 }
@@ -214,12 +220,12 @@ START_TEST(comparison)
   auto a1 = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
   auto a2 = BigInteger2048::FromFile(SOURCE_DIR "data/as.txt");
   auto comp = BigInteger2048::FromFile(SOURCE_DIR "data/comp.txt");
-  
+
   ck_assert_int_eq(BigInteger::GreaterThan((word*)a1[0].GetData(), (word*)a1[0].GetData(), NUM_WORDS_1024, NUM_WORDS_1024), false);
   ck_assert_int_eq(BigInteger::GreaterThan((word*)a1[0].GetData(), (word*)a1[3].GetData(), NUM_WORDS_1024, NUM_WORDS_1024), true);
   ck_assert_int_eq(BigInteger::GreaterThan((word*)a1[4].GetData(), (word*)a1[5].GetData(), NUM_WORDS_1024, NUM_WORDS_1024), false);
   ck_assert_int_eq(BigInteger::GreaterThan((word*)a1[6].GetData(), (word*)a1[7].GetData(), NUM_WORDS_1024, NUM_WORDS_1024), true);
-  
+
   ck_assert_int_eq(BigInteger::GreaterThan((word*)a1[0].GetData(), (word*)a2[3].GetData(), NUM_WORDS_1024, NUM_WORDS_2048), true);
   ck_assert_int_eq(BigInteger::GreaterThan((word*)a2[6].GetData(), (word*)a1[6].GetData(), NUM_WORDS_2048, NUM_WORDS_1024), true);
 
@@ -235,7 +241,7 @@ START_TEST(comparison)
   ck_assert_int_eq(BigInteger::SmallerThan((word*)a1[0].GetData(), (word*)a1[3].GetData(), NUM_WORDS_1024, NUM_WORDS_1024), false);
   ck_assert_int_eq(BigInteger::SmallerThan((word*)a1[4].GetData(), (word*)a1[5].GetData(), NUM_WORDS_1024, NUM_WORDS_1024), true);
   ck_assert_int_eq(BigInteger::SmallerThan((word*)a1[6].GetData(), (word*)a1[7].GetData(), NUM_WORDS_1024, NUM_WORDS_1024), false);
-  
+
   ck_assert_int_eq(BigInteger::SmallerThan((word*)a1[0].GetData(), (word*)a2[3].GetData(), NUM_WORDS_1024, NUM_WORDS_2048), false);
   ck_assert_int_eq(BigInteger::SmallerThan((word*)a2[6].GetData(), (word*)a1[6].GetData(), NUM_WORDS_2048, NUM_WORDS_1024), false);
 
@@ -267,7 +273,7 @@ int main(int argc, char** argv)
   tcase_add_test(tcase, powermod2048);
   tcase_add_test(tcase, division2048);
   suite_add_tcase(suite, tcase);
-  
+
   tcase = tcase_create("BigInteger1024");
   tcase_add_test(tcase, addition1024);
   tcase_add_test(tcase, subtraction1024);

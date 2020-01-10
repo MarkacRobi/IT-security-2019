@@ -4,7 +4,11 @@
 #include <cstdint>
 #include <cstddef>
 #include <string>
+#ifdef PROTOCOLS
+#include "bigint_ref/BigInteger1024.h"
+#else
 #include "bigint/BigInteger1024.h"
+#endif
 
 namespace utils{
     std::vector<BigInteger1024> getFile(uint8_t fileIndex, uint16_t blocksPerImage);
