@@ -1,10 +1,14 @@
 #include "paillier.h"
+#include "bigint/BigInteger.h"
 
 paillier::paillier(){
-    // \TODO Initialize g with a random number and initialize the private keys correctly
+    // \TODO Initialize g with a random number - DONE
     g = BigInteger2048();
-    lambda = BigInteger1024();
-    mue = BigInteger1024();
+    g.Randomize();
+    // TODO initialize the private keys correctly
+    lambda = lcm(p - one, q - one);
+    // if using p,q of equivalent length, this is a simpler variant TODO: test and change
+    mue = BigInteger1024::Inverse(lambda);
 }
 
 
@@ -33,3 +37,39 @@ BigInteger2048 paillier::encrypt(const BigInteger1024 &plaintext)
     // \TODO Make sure to check the restrictions on the involved values
     return BigInteger2048();
 }
+
+bool not_equal(const BigInteger1024& a, const BigInteger1024& b) {
+    if(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_BYTES_1024)) {
+        return true;
+    }
+    if(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_BYTES_1024)) {
+        return true;
+    }
+    return true;
+}
+
+BigInteger1024 paillier::L(const BigInteger1024& u_) {
+    return BigInteger2048(u_ - one) / m;
+}
+
+BigInteger1024 paillier::lcm(const BigInteger1024& p_minus_1, const BigInteger1024& q_minus_1) {
+    printf("lcm");
+    return BigInteger2048(p_minus_1 * q_minus_1) / gcd(p_minus_1, q_minus_1);
+}
+
+BigInteger1024 paillier::gcd(const BigInteger1024& a, const BigInteger1024& b) {
+    BigInteger1024 a_ = BigInteger1024(a);
+    BigInteger1024 b_ = BigInteger1024(b);
+
+    while(not_equal(a_,b_)) {
+        if(BigInteger::GreaterThan((word*)a_.GetData(), (word*)b_.GetData(), NUM_WORDS_1024, NUM_BYTES_1024)) {
+            a_ = a_ - b_;
+        } else {
+            b_ = b_ - a_;
+        }
+    }
+
+    BigInteger1024 r = BigInteger1024(a_);
+    return r;
+}
+
