@@ -252,24 +252,32 @@ BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
   BigInteger1024 result = BigInteger1024(0);
 
   word result_array[128];
-    memset(result_array, 0, 128 * sizeof(word));
+  memset(result_array, 0, 128 * sizeof(word));
 
   int index = 0;
   BigInteger2048 dividend_n = BigInteger2048(a);
   BigInteger1024 divisor_d = BigInteger1024(b);
   word shift_array[129];
   word div_array[129];
-  memset(div_array, 0, 129*sizeof(word));
-    memcpy(div_array, a.GetData(), NUM_BYTES_1024);
+
+  memset(div_array, 0, 257*sizeof(word));
+  memcpy(div_array, a.GetData(), NUM_BYTES_2048);
 
 
-
-    memset(shift_array, 0, 129 * sizeof(word));
-    memcpy(shift_array, b.GetData(), NUM_BYTES_1024);
-
+  memset(shift_array, 0, 129 * sizeof(word));
+  memcpy(shift_array, b.GetData(), NUM_BYTES_1024);
 
   int carry = 0;
-  while(!BigInteger::GreaterThan((word*)shift_array, (word*)dividend_n.GetData(), NUM_WORDS_2048 + 1, NUM_WORDS_2048))
+
+    printf("result before shifting is ");
+    for(int i = 0; i < 129; i++)
+    {
+        printf("%x", shift_array[i]);
+    }
+    printf("\n");
+
+
+    while(!BigInteger::GreaterThan((word*)shift_array, (word*)dividend_n.GetData(), NUM_WORDS_2048 + 1, NUM_WORDS_2048))
   {
 
       carry = 0;
@@ -280,23 +288,61 @@ BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
           carry = temp_result >> 16;
           shift_array[i] = temp_result;
       }
+
+//      printf("Index is %d\n", index);
+//      printf("result after shifting is ");
+//      for(int i = 0; i < 129; i++)
+//      {
+//          printf("%x", shift_array[i]);
+//      }
+//      printf("\n");
     index++;
 
   }
     printf("Index is %d\n", index);
+  printf("result after shifting is ");
+  for(int i = 0; i < 129; i++)
+  {
+      printf("%x", shift_array[i]);
+  }
+  printf("\n");
+
   int carry_;
+    word test[16];
+    test[7] = 0xab;
+    test[6] = 0xab;
+    test[5] = 0x12;
+    test[4] = 0x12;
+    test[3] = 0x12;
+    test[2] = 0x12;
+    test[1] = 0x34;
+    test[0] = 0x56;
+//  for(int i = 0; i < 16; i++)
+//      test[i] = i+5;
+//
+//    printf("result after  is ");
+//    for(int i = 15; i >= 0; i--)
+//    {
+//        printf("%x", test[i]);
+//    }
+//    printf("\n");
+
+
   while(index > 0)
   {
       carry = 0;
       for(int i = 128; i >= 0; i--)
       {
-
+          //printf("uso\n");
           carry = (shift_array[i] & 0x1) << 16;
-          uint32 temp_result = ( uint32 (shift_array[i])  >> 1) |  (carry<<15);
+          //printf("carry is %x\n", carry);
+          uint32 temp_result = ( uint32 (shift_array[i])  >> 1) |  (carry << 15);
           shift_array[i] = temp_result;
+          //printf("temp result is %x\n", temp_result);
+
       }
 
-      carry_ = 0;l
+      carry_ = 0;
       for(int i = 0; i < 129; i++)
       {
 
@@ -306,10 +352,28 @@ BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
       }
 
 
-    if(!BigInteger::GreaterThan((word*)shift_array, (word*)div_array, NUM_WORDS_2048 + 1, NUM_WORDS_2048))
+    if(!BigInteger::GreaterThan((word*)shift_array, (word*)div_array, NUM_WORDS_2048 + 1, NUM_WORDS_2048 + 1))
     {
+//        printf("Result1 is: ");
+//        for(int i=0; i<129; i++)
+//            printf("%x", shift_array[i]);
+//        printf("\n");
+//
+//
+//        printf("Result2 is: ");
+//        for(int i=0; i<257; i++)
+//            printf("%x", div_array[i]);
+//        printf("\n");
 
-        BigInteger::SubtractIntegers((word*)div_array, (word*)div_array, (word*)shift_array, (word*)(div_array + NUM_WORDS_1024), NUM_WORDS_1024);
+        printf("carry is %x\n", (word*)(div_array + NUM_BYTES_1024));
+        BigInteger::SubtractIntegers((word*)div_array, (word*)div_array, (word*)shift_array, (word*)(div_array + NUM_BYTES_1024 + 1), NUM_WORDS_1024);
+
+//        printf("Result2 is: ");
+//        for(int i=0; i<257; i++)
+//            printf("%x", div_array[i]);
+//        printf("\n");
+
+        //break;
         result_array[0]= result_array[0] + 1;
     }
     index--;

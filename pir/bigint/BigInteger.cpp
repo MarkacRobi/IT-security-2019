@@ -168,6 +168,7 @@ void BigInteger::SubtractIntegers(word* c, word* a, word* b, word* borrow, uint3
     }
 
     *borrow = borrow_;
+    printf("borrwo is %x\n", *borrow);
 
 }
 

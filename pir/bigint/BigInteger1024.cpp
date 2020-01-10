@@ -186,7 +186,7 @@ BigInteger1024 operator-(const BigInteger1024& a, const BigInteger1024& b) {
 
 BigInteger1024 operator*(const BigInteger1024& a, const BigInteger1024& b) {
   // TODO: To implement
-  const std::string mu = ("0x107d4dc7c15d75295370e77aabf1c2ef0ff6deb6ea995a226c8dca38fd2e82e43ac54fa62085abf63d7798201ba124facbe4cb974dbaf72cd0e96863b79ce3af37d912421c2a18ae3b6215fbd0e5aa7459105a61e9804adb14aba3c966f20e8e36935db78cd08814cda1969510b0ed92dbd71d38b8aa5adbdf4742fb5157e1a17d5321ed548394c130496819943c2e90d4a74d73f38958232766a52309f2520b9194199bd80014a0c08d23a529d0f2a1fd933599301b8fb8941c52fa5701904c6039cab96f3e028554e3922f385eca64dc0e2a905682bd90f7b006fd23b5d057fcd6be7203d3f19d4d1733bba95ff5c9740044134e7c0c6ab510fc5abL");
+  /*const std::string mu = ("0x107d4dc7c15d75295370e77aabf1c2ef0ff6deb6ea995a226c8dca38fd2e82e43ac54fa62085abf63d7798201ba124facbe4cb974dbaf72cd0e96863b79ce3af37d912421c2a18ae3b6215fbd0e5aa7459105a61e9804adb14aba3c966f20e8e36935db78cd08814cda1969510b0ed92dbd71d38b8aa5adbdf4742fb5157e1a17d5321ed548394c130496819943c2e90d4a74d73f38958232766a52309f2520b9194199bd80014a0c08d23a529d0f2a1fd933599301b8fb8941c52fa5701904c6039cab96f3e028554e3922f385eca64dc0e2a905682bd90f7b006fd23b5d057fcd6be7203d3f19d4d1733bba95ff5c9740044134e7c0c6ab510fc5abL");
    BigInteger2048 x;
     BigInteger1024 q;
 
@@ -204,9 +204,7 @@ BigInteger1024 operator*(const BigInteger1024& a, const BigInteger1024& b) {
     for(int i=0; i<NUM_BYTES_1024; i++)
     {
         mempcpy(new_x[i], number_of_times_to_shift, 2);
-    }
-
-
+    }*/
 
 
   return BigInteger1024(0);
