@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 BigInteger1024::BigInteger1024(uint64 init_value) {
   // ASSUME num_bits mod WORD_SIZE = 0
@@ -191,7 +192,29 @@ BigInteger1024 operator*(const BigInteger1024& a, const BigInteger1024& b) {
 
 BigInteger1024 BigInteger1024::PowerMod(const BigInteger1024& a, const BigInteger1024& b) {
   // TODO: To implement
-  return BigInteger1024(0);
+  BigInteger1024  power_result;
+  for(int i = 0; i < NUM_BYTES_1024; i++)
+  {
+
+      if(a.GetData()[i] != 0)
+      {
+          printf("usooo\n");
+          printf("%x\n", a.GetData()[i]);
+          printf("%x\n", b.GetData()[i]);
+          //power_result.GetData()[i] = pow(a.GetData()[i], b.GetData()[i]);
+          long index = b.GetData()[i];
+          int temp = 1;
+          while(index != 0)
+          {
+              temp *= a.GetData()[i];
+              index--;
+              printf("---> %x\n", temp);
+          }
+          power_result.GetData()[i] = temp;
+      }
+  }
+
+  return power_result;
 }
 
 BigInteger1024 BigInteger1024::Inverse(const BigInteger1024& a) {
