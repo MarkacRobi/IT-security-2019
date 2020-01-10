@@ -3,7 +3,11 @@
 #include <iostream>
 #include <fstream>
 #include "../shamir.h"
+#ifdef PROTOCOLS
+#include "../bigint_ref/BigInteger1024.h"
+#else
 #include "../bigint/BigInteger1024.h"
+#endif
 #include "../random.h"
 
 namespace {
@@ -87,7 +91,7 @@ START_TEST(generate_shares)
   test.generateShamirPolynomial(secret);
   test.setIndices(indices);
   std::vector<BigInteger1024> shares = test.generateShamirShares();
-  
+
   std::vector<BigInteger1024> expected = {
     BigInteger1024("27402698d4cd895574ba982a5dda11683046ec1582fa873de8b39df88c99fabeed9a2d5ca58a1bd00ebe4920563ceb90526431189d3e054164bcf1dcc1c446de895f4c2987b0704174d314f80f4bbc1793e2aa05c42d07ade2639c1a62e66c4349d68a9586b5e7a6e64354532512e236770a0c74cf44dbfe837855575ca16210"),
     BigInteger1024("a7e5315c84bbd6dee564017a3bcfca669276ef939e8aa91c9c69261c6a28eab7713343affd8c5e376bbcc069c10ab376e757a5e0ea13150ab36f689b96faf758e178d44bd350f7be012838cc7ba8482bfa7456e3c0de553641af6db76274baf477eace7a5c2efb117029a10f71836bd6f9af4354ca334581d4573ec2cb252594"),
@@ -98,7 +102,7 @@ START_TEST(generate_shares)
     BigInteger1024("7445a77ceb43a80209f0842e12152e4abe4ff6a3e7f2b9c0c5fbf78fc550c3607bc099e9211d809df882970f929051f3bcc7c359bc0ded4a0508f705d7ae34f52084835390a5f9dbc719b884ee8156926366e6d352e4f3b28b631f184643a74a887732cbb3b63d0f3d1c7b2db6dd1e613dd8e57d2ae81867926cb39f0c4aed1a"),
     BigInteger1024("0bddff29dbbc44a9eaa3a730f8114379c791516ce49632bf5c9c60f5716cc376d0aa158f03b7f495542359ff0342ba925eef1f815ef8cc1f55184c6ada08c8aaf8529743ff15cb70bd1f703e568c3bc6e68892c25aff58ecf5192a1d8ecf0605767d3dcec0d982601d11e23a7b40a053dbe44b22cf970488eb6a1a789040b72a"),
   };
-  
+
   for(size_t i = 0; i < expected.size(); ++i)
   {
     ck_assert_bi_eq(shares.at(i), expected.at(i));
@@ -133,7 +137,6 @@ START_TEST(share_0_and_1){
   test1.setIndices(std::vector<BigInteger1024>(indices.begin(), indices.begin()+degree+1));
   std::vector<BigInteger1024> shares_2 = test1.generateShamirShares();
 
-
   BigInteger1024 rec_zero = test.reconstructSecret(shares_1);
   BigInteger1024 rec_one = test1.reconstructSecret(shares_2);
 
@@ -153,7 +156,7 @@ int main(int argc, char* argv[]){
   tcase_add_test(tcase, random_small);
   tcase_add_test(tcase, reconstruct_fixed_small);
   tcase_add_test(tcase, share_0_and_1);
-
+  tcase_set_timeout(tcase, 120);
   suite_add_tcase(suite, tcase);
 
   SRunner* suite_runner = srunner_create(suite);

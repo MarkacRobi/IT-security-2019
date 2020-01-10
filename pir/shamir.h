@@ -1,7 +1,11 @@
 #ifndef SHAMIR_H
 #define SHAMIR_H
 
+#ifdef PROTOCOLS
+#include "bigint_ref/BigInteger1024.h"
+#else
 #include "bigint/BigInteger1024.h"
+#endif
 #include <vector>
 #include <cstdint>
 #include <cstddef>

@@ -3,7 +3,11 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+#ifdef PROTOCOLS
+#include "bigint_ref/types.h"
+#else
 #include "bigint/types.h"
+#endif
 #include "../tls/aes/aes128.h"
 
 class Random

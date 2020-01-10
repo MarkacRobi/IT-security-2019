@@ -6,8 +6,13 @@
 
 #include "utils.h"
 #include <check.h>
+#ifdef PROTOCOLS
+#include "../pir/bigint_ref/BigInteger1024.h"
+#include "../pir/bigint_ref/BigInteger2048.h"
+#else
 #include "../pir/bigint/BigInteger1024.h"
 #include "../pir/bigint/BigInteger2048.h"
+#endif
 
 namespace
 {

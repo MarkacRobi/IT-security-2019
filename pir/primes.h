@@ -5,7 +5,11 @@
 #ifndef ITS2018_PRIMES_H
 #define ITS2018_PRIMES_H
 
+#ifdef PROTOCOLS
+#include "bigint_ref/BigInteger1024.h"
+#else
 #include "bigint/BigInteger1024.h"
+#endif
 #include "string"
 
 namespace primes{

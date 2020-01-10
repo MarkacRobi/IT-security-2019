@@ -7,8 +7,13 @@
 
 #include <cstdint>
 #include <vector>
+#ifdef PROTOCOLS
+#include "bigint_ref/BigInteger1024.h"
+#include "bigint_ref/BigInteger2048.h"
+#else
 #include "bigint/BigInteger1024.h"
 #include "bigint/BigInteger2048.h"
+#endif
 #include "utils.h"
 #include "paillier.h"
 

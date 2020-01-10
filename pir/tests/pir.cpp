@@ -97,16 +97,16 @@ int main(int argc, char** argv)
   TCase* tcase = tcase_create("pir_client");
   tcase_add_test(tcase, createQuery);
   tcase_add_test(tcase, clientFinish);
-  tcase_set_timeout(tcase, 120);
+  tcase_set_timeout(tcase, 240);
   suite_add_tcase(suite, tcase);
 
   tcase = tcase_create("pir_server");
-  tcase_set_timeout(tcase, 120);
+  tcase_set_timeout(tcase, 240);
   tcase_add_test(tcase, serverResponse);
   suite_add_tcase(suite, tcase);
   
   tcase = tcase_create("execute protocol");
-  tcase_set_timeout(tcase, 240);
+  tcase_set_timeout(tcase, 300);
   tcase_add_test(tcase, executeProtocol);
   suite_add_tcase(suite, tcase);
   

@@ -151,6 +151,7 @@ START_TEST(inverse1024)
 }
 END_TEST
 
+
 START_TEST(add)
 {
   auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
@@ -164,6 +165,7 @@ START_TEST(add)
     const auto& b = bs.at(i);
     BigInteger2048 c;
     BigInteger::AddIntegers((word*)c.GetData(), (word*)a.GetData(), (word*)b.GetData(), (word*)(c.GetData() + NUM_BYTES_1024), NUM_WORDS_1024);
+        
     ck_assert_bi_eq(c, sums.at(i));
   }
 }
@@ -197,7 +199,6 @@ START_TEST(multiply)
   
   for(unsigned int i = 0; i < as.size(); i++)
   {
-    printf("Vrstica: %u \n", i + 1);
     const auto& a = as.at(i);
     const auto& b = bs.at(i);
     BigInteger2048 c;

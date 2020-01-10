@@ -2,7 +2,11 @@
 #include <iostream>
 #include <math.h>
 #include "./utils.h"
+#ifdef PROTOCOLS
+#include "bigint_ref/BigInteger2048.h"
+#else
 #include "bigint/BigInteger2048.h"
+#endif
 
 shamir::shamir(uint8_t degree):degree(degree){
 }
@@ -32,4 +36,3 @@ std::vector<BigInteger1024> shamir::generateIndices(uint8_t numShares) {
 void shamir::setIndices(const std::vector<BigInteger1024> &indices) {
     shamir::indices = indices;
 }
-
