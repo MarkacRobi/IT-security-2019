@@ -249,156 +249,143 @@ BigInteger2048 operator*(const BigInteger2048& a, const BigInteger2048& b) {
 
 BigInteger1024 operator/(const BigInteger2048& a, const BigInteger1024& b) {
   // TODO: To implement
-    BigInteger1024 result = BigInteger1024(0);
+  BigInteger1024 result = BigInteger1024(0);
 
-    word result_array[129];
-    memset(result_array, 0, 129 * sizeof(word));
+  word result_array[128];
+  memset(result_array, 0, 128 * sizeof(word));
 
-    int index = 0;
-    BigInteger2048 dividend_n = BigInteger2048(a);
-    BigInteger1024 divisor_d = BigInteger1024(b);
+  int index = 0;
+  BigInteger2048 dividend_n = BigInteger2048(a);
+  BigInteger1024 divisor_d = BigInteger1024(b);
+  word shift_array[129];
+  word div_array[129];
+
+  memset(div_array, 0, 257*sizeof(word));
+  memcpy(div_array, a.GetData(), NUM_BYTES_2048);
 
 
-    word div_array[257];
-    memset(div_array, 0, 257*sizeof(word));
-    memcpy(div_array, a.GetData(), NUM_BYTES_2048);
+  memset(shift_array, 0, 129 * sizeof(word));
+  memcpy(shift_array, b.GetData(), NUM_BYTES_1024);
 
+  int carry = 0;
 
-    printf("div_array is: ");
-    for(int i = 0; i < 257; i++)
-    {
-        printf("%x", div_array[i]);
-    }
-    printf("\n");
-
-    word shift_array[129];
-    memset(shift_array, 0, 129 * sizeof(word));
-    memcpy(shift_array, b.GetData(), NUM_BYTES_1024);
-
-    printf("before shifting is: ");
-    for(int i = 128; i >= 0; i--)
+    printf("result before shifting is ");
+    for(int i = 0; i < 129; i++)
     {
         printf("%x", shift_array[i]);
     }
     printf("\n");
 
-    while(!BigInteger::GreaterThan((word*)shift_array, (word*)div_array, NUM_WORDS_1024 + 1, NUM_WORDS_2048 + 1))
-    {
-        /*int carry = 0;
-        for(int i = 0; i < 129; i++)
-        {
 
-            uint32 temp_result = ( uint32 (shift_array[i])  << 1) +  carry;
-            carry = temp_result >> 16;
-            shift_array[i] = temp_result;
-        }*/
+    while(!BigInteger::GreaterThan((word*)shift_array, (word*)dividend_n.GetData(), NUM_WORDS_2048 + 1, NUM_WORDS_2048))
+  {
 
-        shift_array[128] = shift_array[128] << 1;
-        for(int i = 127; i >= 0; i--)
-        {
-            shift_array[i + 1] = shift_array[i + 1] | ((shift_array[i] & (0x1 << 15)) >> 15);
-            shift_array[i] = shift_array[i] << 1;
+      carry = 0;
+      for(int i = 0; i < 129; i++)
+      {
 
-        }
+          uint32 temp_result = ( uint32 (shift_array[i])  << 1) +  carry;
+          carry = temp_result >> 16;
+          shift_array[i] = temp_result;
+      }
 
+//      printf("Index is %d\n", index);
+//      printf("result after shifting is ");
+//      for(int i = 0; i < 129; i++)
+//      {
+//          printf("%x", shift_array[i]);
+//      }
+//      printf("\n");
+    index++;
 
-//        printf("after shifting in for loop is: ");
-//        for(int i = 128; i >= 0; i--)
-//        {
-//            printf("%x", shift_array[i]);
-//        }
-//        printf("\n");
-        index++;
-
-    }
+  }
     printf("Index is %d\n", index);
+  printf("result after shifting is ");
+  for(int i = 0; i < 129; i++)
+  {
+      printf("%x", shift_array[i]);
+  }
+  printf("\n");
+
+  int carry_;
+    word test[16];
+    test[7] = 0xab;
+    test[6] = 0xab;
+    test[5] = 0x12;
+    test[4] = 0x12;
+    test[3] = 0x12;
+    test[2] = 0x12;
+    test[1] = 0x34;
+    test[0] = 0x56;
+//  for(int i = 0; i < 16; i++)
+//      test[i] = i+5;
 //
-//    printf("after shifting is: ");
-//    for(int i = 0; i < 129; i++)
+//    printf("result after  is ");
+//    for(int i = 15; i >= 0; i--)
 //    {
-//        printf("%x", shift_array[i]);
+//        printf("%x", test[i]);
 //    }
 //    printf("\n");
 
 
-    while(index > 0)
+  while(index > 0)
+  {
+      carry = 0;
+      for(int i = 128; i >= 0; i--)
+      {
+          //printf("uso\n");
+          carry = (shift_array[i] & 0x1) << 16;
+          //printf("carry is %x\n", carry);
+          uint32 temp_result = ( uint32 (shift_array[i])  >> 1) |  (carry << 15);
+          shift_array[i] = temp_result;
+          //printf("temp result is %x\n", temp_result);
+
+      }
+
+      carry_ = 0;
+      for(int i = 0; i < 129; i++)
+      {
+
+          uint32 temp_result_ = ( uint32 (result_array[i]) << 1) + carry_;
+          carry_ = temp_result_ >> 16;
+          result_array[i] = temp_result_;
+      }
+
+
+    if(!BigInteger::GreaterThan((word*)shift_array, (word*)div_array, NUM_WORDS_2048 + 1, NUM_WORDS_2048 + 1))
     {
-        //carry = 0;
-        shift_array[0] = shift_array[0] >> 1;
-        for(int i = 1; i < 129; i++)
-        {
-            shift_array[i - 1] = (shift_array[i - 1]) | ((shift_array[i] & 0x1) << 15);
-            shift_array[i] = shift_array[i] >> 1;
-
-//          carry = (shift_array[i] & 0x1);
-//          uint32 temp_result = ( uint32 (shift_array[i])  >> 1) |  (carry << 15);
-//
-//          shift_array[i] = temp_result;
-
-        }
-
-        /*carry_ = 0;
-        for(int i = 0; i < 129; i++)
-        {
-
-            uint32 temp_result_ = ( uint32 (result_array[i]) << 1) + carry_;
-            carry_ = temp_result_ >> 16;
-            result_array[i] = temp_result_;
-        }*/
-        result_array[128] = result_array[128] << 1;
-        for(int i = 127; i >= 0; i--)
-        {
-            result_array[i + 1] = (result_array[i + 1]) | ((result_array[i] & (0x1 << 15)) >> 15);
-            result_array[i] = result_array[i] << 1;
-
-        }
-
-
-        if(!BigInteger::GreaterThan((word*)shift_array, (word*)div_array, NUM_WORDS_1024 + 1, NUM_WORDS_2048 + 1))
-        {
-
-//            printf("Result2 is: ");
-//            for(int i=0; i<257; i++)
-//                printf("%x", div_array[i]);
-//            printf("\n");
-//
-//            printf("- \n");
-//
-//                    printf("Result1 is: ");
+//        printf("Result1 is: ");
 //        for(int i=0; i<129; i++)
 //            printf("%x", shift_array[i]);
 //        printf("\n");
-
-
-
-            BigInteger::SubtractIntegers(div_array, div_array, shift_array, div_array + NUM_BYTES_1024 + 1, NUM_WORDS_2048 + 1);
-
-
+//
+//
 //        printf("Result2 is: ");
-//
 //        for(int i=0; i<257; i++)
-//
 //            printf("%x", div_array[i]);
-//
 //        printf("\n");
 
-            //break;
-            result_array[0]= result_array[0] + 1;
-        }
-        index--;
-    }
+        printf("carry is %x\n", (word*)(div_array + NUM_BYTES_1024));
+        BigInteger::SubtractIntegers((word*)div_array, (word*)div_array, (word*)shift_array, (word*)(div_array + NUM_BYTES_1024 + 1), NUM_WORDS_1024);
 
+//        printf("Result2 is: ");
+//        for(int i=0; i<257; i++)
+//            printf("%x", div_array[i]);
+//        printf("\n");
 
-    printf("after shifting is: ");
-    for(int i = 128; i >= 0; i--)
-    {
-        printf("%x", shift_array[i]);
+        //break;
+        result_array[0]= result_array[0] + 1;
     }
-    printf("\n");
+    index--;
+  }
+
     BigInteger1024 temp;
     memcpy(temp.GetData(), result_array, NUM_BYTES_1024);
-
-    return temp;
+  printf("Result is: ");
+  for(int i=0; i<256; i++)
+    printf("%x", temp.GetData()[i]);
+  printf("\n");
+  return temp;
 }
 
 
