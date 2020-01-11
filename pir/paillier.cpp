@@ -1,14 +1,19 @@
 #include "paillier.h"
 #include "bigint/BigInteger.h"
+#include "primes.h"
 
 paillier::paillier(){
-    // \TODO Initialize g with a random number - DONE
+    // \TODO Initialize g with a random number
     g = BigInteger2048();
     g.Randomize();
     // TODO initialize the private keys correctly
     lambda = lcm(p - one, q - one);
-    // if using p,q of equivalent length, this is a simpler variant TODO: test and change
+    // if using p,q of equivalent length, this is a simpler variant from WIKIPEDIA
+    // TODO: check if it is enough, otherwise use harder variant below
     mue = BigInteger1024::Inverse(lambda);
+    // harder variant for case when p an q are not equal -> mue = (L(g^lambda mod m^2))^-1 mod m
+//    const BigInteger1024 g_on_lambda_mod_m2 = BigInteger2048::PowerMod(g, BigInteger2048(lambda)) / m;
+//    mue = BigInteger1024::Inverse(L(g_on_lambda_mod_m2));
 }
 
 
@@ -28,7 +33,11 @@ const BigInteger1024 paillier::m = BigInteger1024(u);
 BigInteger1024 paillier::decrypt(const BigInteger2048 &ciphertext)
 {
   // \TODO decrypt the given ciphertext using the private keys mue and lmabda and return the resulting plaintext
-  return BigInteger1024();
+  // formula P = L(ciphertext^lambda (mod m^2)) * mue (mod m)
+  // calculate C to power of lambda, which is moduled by m, and then divide again by m to get moduled by m^2 ???
+  const BigInteger1024 C_on_lambda_mod_m2 = BigInteger2048::PowerMod(ciphertext, BigInteger2048(lambda)) / m;
+
+  return L(C_on_lambda_mod_m2) * mue;
 }
 
 BigInteger2048 paillier::encrypt(const BigInteger1024 &plaintext)
@@ -47,16 +56,15 @@ bool not_equal(const BigInteger1024& a, const BigInteger1024& b) {
     }
     return true;
 }
-
+// L(u) = round_down((u - 1) / m ) page 35
 BigInteger1024 paillier::L(const BigInteger1024& u_) {
     return BigInteger2048(u_ - one) / m;
 }
-
+// lcm we need to calculate lambda = lcm(p - 1, q - 1)
 BigInteger1024 paillier::lcm(const BigInteger1024& p_minus_1, const BigInteger1024& q_minus_1) {
-    printf("lcm");
     return BigInteger2048(p_minus_1 * q_minus_1) / gcd(p_minus_1, q_minus_1);
 }
-
+// Euclidean algorithm, page 36 - Algorithm 9 TODO: check if making new BigInt1024 objects makes sense
 BigInteger1024 paillier::gcd(const BigInteger1024& a, const BigInteger1024& b) {
     BigInteger1024 a_ = BigInteger1024(a);
     BigInteger1024 b_ = BigInteger1024(b);
