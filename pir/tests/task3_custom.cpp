@@ -1,5 +1,6 @@
 #include "../../utils/tests.h"
 #include <check.h>
+#include "../paillier.h"
 
 // Include your custom testcases here
 // Write at LEAST 10 custom tests to verify your own implementation.
@@ -31,24 +32,201 @@ namespace
 {
   // include the constants you need for your test here
   // const std::string test_string = "its_2018";
+    auto as = BigInteger1024::FromFile(SOURCE_DIR "data/as1024.txt");
+    auto bs = BigInteger1024::FromFile(SOURCE_DIR "data/bs1024.txt");
+    auto zero_1024 = bs[0];
+    auto max_1024 = bs[2];
+    const BigInteger1024 one_1024 = BigInteger1024(1);
 }
 
-// Sample to illustrate test:
-//
-// START_TEST(custom_1){
-//   std::string part1 = "its";
-//   std::string part2 = "_2018";
-//   std::string to_check = part1 + part2;
-//   ck_assert_str_eq(test_string.c_str(), to_check.c_str());
-// }
-// END_TEST
+ START_TEST(lcm){
+    ck_assert_bi_eq(paillier::lcm(as[0],bs[0]), zero_1024);
+ }
+ END_TEST
+
+START_TEST(addition_empty_1024){
+        auto res = BigInteger1024() + BigInteger1024();
+        ck_assert_bi_eq(res, BigInteger1024());
+    }
+END_TEST
+
+START_TEST(addition_zero_1024){
+        auto res = BigInteger1024(0) + BigInteger1024(0);
+        ck_assert_bi_eq(res, BigInteger1024(0));
+    }
+END_TEST
+
+START_TEST(addition_empty_2048){
+        auto res = BigInteger2048() + BigInteger2048();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+START_TEST(addition_zero_2048){
+        auto res = BigInteger2048(0) + BigInteger2048(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(addition_zero_2048_1024){
+        auto res = BigInteger2048(0) + BigInteger1024(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(addition_zero_1024_2048){
+        auto res = BigInteger1024(0) + BigInteger2048(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(addition_empty_2048_1024){
+        auto res = BigInteger2048() + BigInteger1024();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+START_TEST(addition_empty_1024_2048){
+        auto res = BigInteger1024() + BigInteger2048();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+START_TEST(subtraction_empty_1024){
+        auto res = BigInteger1024() - BigInteger1024();
+        ck_assert_bi_eq(res, BigInteger1024());
+    }
+END_TEST
+
+START_TEST(subtraction_zero_1024){
+        auto res = BigInteger1024(0) - BigInteger1024(0);
+        ck_assert_bi_eq(res, BigInteger1024(0));
+    }
+END_TEST
+
+START_TEST(subtraction_empty_2048){
+        auto res = BigInteger2048() - BigInteger2048();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+START_TEST(subtraction_zero_2048){
+        auto res = BigInteger2048(0) - BigInteger2048(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(subtraction_zero_2048_1024){
+        auto res = BigInteger2048(0) - BigInteger1024(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(subtraction_zero_1024_2048){
+        auto res = BigInteger1024(0) - BigInteger2048(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(subtraction_empty_2048_1024){
+        auto res = BigInteger2048() - BigInteger1024();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+START_TEST(subtraction_empty_1024_2048){
+        auto res = BigInteger1024() - BigInteger2048();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+START_TEST(multiplication_empty_1024){
+        auto res = BigInteger1024() * BigInteger1024();
+        ck_assert_bi_eq(res, BigInteger1024());
+    }
+END_TEST
+
+START_TEST(multiplication_zero_1024){
+        auto res = BigInteger1024(0) * BigInteger1024(0);
+        ck_assert_bi_eq(res, BigInteger1024(0));
+    }
+END_TEST
+
+START_TEST(multiplication_empty_2048){
+        auto res = BigInteger2048() * BigInteger2048();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+START_TEST(multiplication_zero_2048){
+        auto res = BigInteger2048(0) * BigInteger2048(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(multiplication_zero_2048_1024){
+        auto res = BigInteger2048(0) * BigInteger1024(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(multiplication_zero_1024_2048){
+        auto res = BigInteger1024(0) * BigInteger2048(0);
+        ck_assert_bi_eq(res, BigInteger2048(0));
+    }
+END_TEST
+
+START_TEST(multiplication_empty_2048_1024){
+        auto res = BigInteger2048() * BigInteger1024();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+START_TEST(multiplication_empty_1024_2048){
+        auto res = BigInteger1024() * BigInteger2048();
+        ck_assert_bi_eq(res, BigInteger2048());
+    }
+END_TEST
+
+
 
 int main(int argc, char** argv)
 {
-  Suite* suite = suite_create("Student Task 2 Tests");
-  // TCase* tcase = tcase_create("FIRST");
-  // tcase_add_test(tcase, custom_1);
-  // suite_add_tcase(suite, tcase);
+  Suite* suite = suite_create("Student Task 3 Tests");
+
+   TCase* tcase_paillier = tcase_create("Paillier");
+   tcase_add_test(tcase_paillier, lcm);
+   suite_add_tcase(suite, tcase_paillier);
+
+    TCase* tcase_bigInt = tcase_create("BigInt");
+    tcase_add_test(tcase_bigInt, addition_empty_1024);
+    tcase_add_test(tcase_bigInt, addition_zero_1024);
+    tcase_add_test(tcase_bigInt, addition_empty_2048);
+    tcase_add_test(tcase_bigInt, addition_zero_2048);
+    tcase_add_test(tcase_bigInt, addition_zero_2048_1024);
+    tcase_add_test(tcase_bigInt, addition_zero_1024_2048);
+    tcase_add_test(tcase_bigInt, addition_empty_2048_1024);
+    tcase_add_test(tcase_bigInt, addition_empty_1024_2048);
+    tcase_add_test(tcase_bigInt, subtraction_empty_1024);
+    tcase_add_test(tcase_bigInt, subtraction_zero_1024);
+    tcase_add_test(tcase_bigInt, subtraction_empty_2048);
+    tcase_add_test(tcase_bigInt, subtraction_zero_2048);
+    tcase_add_test(tcase_bigInt, subtraction_zero_2048_1024);
+    tcase_add_test(tcase_bigInt, subtraction_zero_1024_2048);
+    tcase_add_test(tcase_bigInt, subtraction_empty_2048_1024);
+    tcase_add_test(tcase_bigInt, subtraction_empty_1024_2048);
+    tcase_add_test(tcase_bigInt, multiplication_empty_1024);
+    tcase_add_test(tcase_bigInt, multiplication_zero_1024);
+    tcase_add_test(tcase_bigInt, multiplication_empty_2048);
+    tcase_add_test(tcase_bigInt, multiplication_zero_2048);
+    tcase_add_test(tcase_bigInt, multiplication_zero_2048_1024);
+    tcase_add_test(tcase_bigInt, multiplication_zero_1024_2048);
+    tcase_add_test(tcase_bigInt, multiplication_empty_2048_1024);
+    tcase_add_test(tcase_bigInt, multiplication_empty_1024_2048);
+
+    suite_add_tcase(suite, tcase_bigInt);
+
+
 
   SRunner* suite_runner = srunner_create(suite);
   srunner_run(suite_runner, argc, argv);
