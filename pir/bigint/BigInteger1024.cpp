@@ -217,9 +217,104 @@ BigInteger1024 BigInteger1024::PowerMod(const BigInteger1024& a, const BigIntege
   return power_result;
 }
 
+bool checkIfModulusIsZero(BigInteger1024 b)
+{
+    bool isZero = true;
+    for(int i = 0; i < NUM_WORDS_1024; i++)
+    {
+        if(b.GetData()[i] == 0)
+            continue;
+        else
+        {
+            isZero = false;
+            break;
+        }
+
+    }
+
+    return isZero;
+}
+
+BigInteger1024 static calcMod(BigInteger2048 a, BigInteger1024 b)
+{
+//    printf("b is ");
+//        for(int i = 0; i < 128; i++)
+//        printf("%x", b.GetModulus()[i]);
+//    printf("\n");
+//
+//
+//    printf("a is ");
+//    for(int i = 0; i < 128; i++)
+//        printf("%x", a.GetData()[i]);
+//    printf("\n");
+
+
+    BigInteger1024 res;
+    for(int i = 0; i < 128; i++)
+    {
+        //printf("a %x\n", a.GetData()[i]);
+        //printf("b %x\n", b.GetModulus()[i]);
+        res.GetData()[i] = a.GetData()[i] % b.GetModulus()[i];
+        //printf("res %x\n", res.GetData()[i]);
+    }
+
+    return res;
+}
+
+BigInteger1024 static ExtEuclidian(BigInteger2048 a, BigInteger1024 b)
+{
+    //    printf("modulus is ");
+//    for(int i = 0; i < 64; i++)
+//        printf("%x", b[i]);
+//    printf("\n");
+//
+//
+//    printf("a is ");
+//    for(int i = 0; i < 64; i++)
+//        printf("%x", a[i]);
+//    printf("\n");
+
+
+    //check if b == 0
+
+
+    BigInteger1024 res = calcMod(a, b);
+
+        printf("res is ");
+    for(int i = 0; i < 128; i++)
+        printf("%x", res.GetData()[i]);
+    printf("\n");
+
+
+    BigInteger1024 res2 = calcMod(b, res);
+
+    printf("res2 is ");
+    for(int i = 0; i < 128; i++)
+        printf("%x", res2.GetData()[i]);
+    printf("\n");
+
+
+//    while(!checkIfModulusIsZero(calcMod(a, b)))
+//    {
+//        printf("nije nula\n");
+//    }
+
+    //printf("jeste nula\n");
+
+    return BigInteger1024(0);
+
+}
+
+
+
 BigInteger1024 BigInteger1024::Inverse(const BigInteger1024& a) {
   // TODO: To implement
-  return BigInteger1024(0);
+  BigInteger1024 b;//modulus
+  BigInteger2048 a_ = BigInteger2048(a);//check this TODO
+
+  BigInteger1024 inverse = ExtEuclidian(a_, b);
+
+  return inverse;
 }
 
 std::vector<BigInteger1024> BigInteger1024::FromFile(const std::string &filename) {
