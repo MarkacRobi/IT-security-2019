@@ -255,6 +255,7 @@ BigInteger1024 static calcMod(BigInteger2048 a, BigInteger1024 b)
         //printf("a %x\n", a.GetData()[i]);
         //printf("b %x\n", b.GetModulus()[i]);
         res.GetData()[i] = a.GetData()[i] % b.GetModulus()[i];
+        //printf("res %x\n", res.GetData()[i]);
     }
 
     return res;
@@ -277,12 +278,28 @@ BigInteger1024 static ExtEuclidian(BigInteger2048 a, BigInteger1024 b)
     //check if b == 0
 
 
-    //while(!checkIfModulusIsZero(calcMod(a, b)))
-    //{
-        //printf("nije nula\n");
-    //}
+    BigInteger1024 res = calcMod(a, b);
 
-    printf("jeste nula\n");
+        printf("res is ");
+    for(int i = 0; i < 128; i++)
+        printf("%x", res.GetData()[i]);
+    printf("\n");
+
+
+    BigInteger1024 res2 = calcMod(b, res);
+
+    printf("res2 is ");
+    for(int i = 0; i < 128; i++)
+        printf("%x", res2.GetData()[i]);
+    printf("\n");
+
+
+//    while(!checkIfModulusIsZero(calcMod(a, b)))
+//    {
+//        printf("nije nula\n");
+//    }
+
+    //printf("jeste nula\n");
 
     return BigInteger1024(0);
 
