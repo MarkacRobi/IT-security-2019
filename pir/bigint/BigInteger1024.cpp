@@ -282,7 +282,7 @@ BigInteger1024 static ExtEuclidian(BigInteger2048 a, BigInteger1024 b)
         //printf("nije nula\n");
     //}
 
-    //printf("jeste nula\n");
+    printf("jeste nula\n");
 
     return BigInteger1024(0);
 
