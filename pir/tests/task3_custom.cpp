@@ -1,7 +1,9 @@
 #include "../../utils/tests.h"
 #include <check.h>
 #include "../paillier.h"
+#include "../bigint/BigInteger.h"
 
+using namespace std;
 // Include your custom testcases here
 // Write at LEAST 10 custom tests to verify your own implementation.
 //
@@ -43,6 +45,18 @@ namespace
     ck_assert_bi_eq(paillier::lcm(as[0],bs[0]), zero_1024);
  }
  END_TEST
+
+START_TEST(not_equals_empty){
+        printf("Testing not_equals_empty:\n");
+        ck_assert_int_eq(paillier::not_equal(BigInteger1024(),BigInteger1024()),false);
+    }
+END_TEST
+
+START_TEST(not_equals_zero){
+        printf("Testing not_equals_zero:\n");
+        ck_assert_int_eq(paillier::not_equal(BigInteger1024(0),BigInteger1024(0)), false);
+    }
+END_TEST
 
 START_TEST(addition_empty_1024){
         auto res = BigInteger1024() + BigInteger1024();
@@ -188,6 +202,19 @@ START_TEST(multiplication_empty_1024_2048){
     }
 END_TEST
 
+START_TEST(zero_greater_than_1024){
+        const BigInteger1024 a = BigInteger1024(0);
+        const BigInteger1024 b = BigInteger1024(0);
+        ck_assert_int_eq(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_WORDS_1024), false);
+    }
+END_TEST
+START_TEST(empty_greater_than_1024){
+        const BigInteger1024 a = BigInteger1024();
+        const BigInteger1024 b = BigInteger1024();
+        ck_assert_int_eq(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_WORDS_1024), false);
+    }
+END_TEST
+
 
 
 int main(int argc, char** argv)
@@ -195,7 +222,9 @@ int main(int argc, char** argv)
   Suite* suite = suite_create("Student Task 3 Tests");
 
    TCase* tcase_paillier = tcase_create("Paillier");
-   tcase_add_test(tcase_paillier, lcm);
+//   tcase_add_test(tcase_paillier, lcm);
+   tcase_add_test(tcase_paillier, not_equals_zero);
+    tcase_add_test(tcase_paillier, not_equals_empty);
    suite_add_tcase(suite, tcase_paillier);
 
     TCase* tcase_bigInt = tcase_create("BigInt");
@@ -223,6 +252,8 @@ int main(int argc, char** argv)
     tcase_add_test(tcase_bigInt, multiplication_zero_1024_2048);
     tcase_add_test(tcase_bigInt, multiplication_empty_2048_1024);
     tcase_add_test(tcase_bigInt, multiplication_empty_1024_2048);
+    tcase_add_test(tcase_bigInt, zero_greater_than_1024);
+    tcase_add_test(tcase_bigInt, empty_greater_than_1024);
 
     suite_add_tcase(suite, tcase_bigInt);
 

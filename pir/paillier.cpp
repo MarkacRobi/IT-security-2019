@@ -48,13 +48,16 @@ BigInteger2048 paillier::encrypt(const BigInteger1024 &plaintext)
 }
 
 bool paillier::not_equal(const BigInteger1024& a, const BigInteger1024& b) {
-    if(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_BYTES_1024)) {
+    if(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_WORDS_1024)) {
+        printf("a is greater than b\n");
         return true;
     }
-    if(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_BYTES_1024)) {
+    if(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_WORDS_1024)) {
+        printf("a is smaller than b\n");
         return true;
     }
-    return true;
+    printf("a is not greater or smaller than b -> returning false\n");
+    return false;
 }
 // L(u) = round_down((u - 1) / m ) page 35
 BigInteger1024 paillier::L(const BigInteger1024& u_) {
