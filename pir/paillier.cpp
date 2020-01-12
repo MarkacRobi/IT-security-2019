@@ -8,8 +8,13 @@ paillier::paillier(){
     // \TODO Initialize g with a random number
     g = BigInteger2048();
     g.Randomize();
+    std::string m = "fff6e927f09e8acd909fe2a501799329f9b37874ded2ace58eb743fed2b375805c9ca946d92a92c727a8638fbd14e0e2027465457f3ea82a9e3659174711f176";
+     BigInteger1024 p_1 = BigInteger1024(std::string(128, '0').append(m));
+    std::string m_2 = "ad84ce6895f481e4cd8431fe63a7efcab27d44b8a42b6292e2f0dfff5d1b389aabb3571a24877d32e34b09066f3bc987e70e0b915fd0a0051afd07f201a66ed6";
+    BigInteger1024 q_1 = BigInteger1024(std::string(128, '0').append(m_2));
+
     // TODO initialize the private keys correctly
-    lambda = lcm(p - one, q - one);
+    lambda = lcm(p_1, q_1);
     // if using p,q of equivalent length, this is a simpler variant from WIKIPEDIA
     // TODO: check if it is enough, otherwise use harder variant below
     mue = BigInteger1024::Inverse(lambda);
@@ -86,8 +91,6 @@ BigInteger1024 paillier::gcd(const BigInteger1024& a, const BigInteger1024& b) {
     BigInteger1024 b_ = BigInteger1024(b);
 //    print_word((word*)a_.GetData(), NUM_WORDS_1024, "a");
 //    print_word((word*)b_.GetData(), NUM_WORDS_1024, "b");
-
-    int counter = 0;
     while(not_equal(a_,b_) ) {
         if(BigInteger::GreaterThan((word*)a_.GetData(), (word*)b_.GetData(), NUM_WORDS_1024, NUM_WORDS_1024)) {
             print_word((word*)a_.GetData(), NUM_WORDS_1024, "a");
@@ -100,11 +103,10 @@ BigInteger1024 paillier::gcd(const BigInteger1024& a, const BigInteger1024& b) {
             b_ = b_ - a_;
             print_word((word*)b_.GetData(), NUM_WORDS_1024, "b after - a");
         }
-        counter++;
     }
 
     BigInteger1024 r;
-    memcpy(r.GetData(), a.GetData(), NUM_BYTES_1024);
+    memcpy(r.GetData(), a_.GetData(), NUM_BYTES_1024);
     return r;
 }
 
