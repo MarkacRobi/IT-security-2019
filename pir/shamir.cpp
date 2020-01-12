@@ -52,7 +52,19 @@ BigInteger1024 shamir::reconstructSecret(const std::vector<BigInteger1024>& shar
 
 std::vector<BigInteger1024> shamir::generateShamirShares(){
     // TODO: generate the Shamir shares using the polynomial and indices which have to be created previously and return them
-    return std::vector<BigInteger1024>();
+    std::vector<BigInteger1024> shares;
+    for(int i = 0; i < indices.size(); i++)
+    {
+        BigInteger1024 sum(0);
+        for(int j = 0; j < polynomial.size(); j++)
+        {
+            BigInteger1024 pow_result = BigInteger1024::PowerMod(indices[i], j);
+            BigInteger1024 temp = pow_result * polynomial[j];
+            sum = sum + temp;
+        }
+        shares.push_back(sum);
+    }
+    return shares;
 }
 
 std::vector<BigInteger1024> shamir::generateShamirPolynomial(const BigInteger1024& secret){
