@@ -2,6 +2,7 @@
 #include "bigint/BigInteger.h"
 #include "primes.h"
 #include "string"
+#include "cstring"
 
 paillier::paillier(){
     // \TODO Initialize g with a random number
@@ -33,12 +34,12 @@ const BigInteger1024 paillier::m = BigInteger1024(u);
 
 BigInteger1024 paillier::decrypt(const BigInteger2048 &ciphertext)
 {
-  // \TODO decrypt the given ciphertext using the private keys mue and lmabda and return the resulting plaintext
-  // formula P = L(ciphertext^lambda (mod m^2)) * mue (mod m)
-  // calculate C to power of lambda, which is moduled by m, and then divide again by m to get moduled by m^2 ???
-  const BigInteger1024 C_on_lambda_mod_m2 = BigInteger2048::PowerMod(ciphertext, BigInteger2048(lambda)) / m;
+    // \TODO decrypt the given ciphertext using the private keys mue and lmabda and return the resulting plaintext
+    // formula P = L(ciphertext^lambda (mod m^2)) * mue (mod m)
+    // calculate C to power of lambda, which is moduled by m, and then divide again by m to get moduled by m^2 ???
+    const BigInteger1024 C_on_lambda_mod_m2 = BigInteger2048::PowerMod(ciphertext, BigInteger2048(lambda)) / m;
 
-  return L(C_on_lambda_mod_m2) * mue;
+    return L(C_on_lambda_mod_m2) * mue;
 }
 
 BigInteger2048 paillier::encrypt(const BigInteger1024 &plaintext)
@@ -87,7 +88,7 @@ BigInteger1024 paillier::gcd(const BigInteger1024& a, const BigInteger1024& b) {
 //    print_word((word*)b_.GetData(), NUM_WORDS_1024, "b");
 
     int counter = 0;
-    while(not_equal(a_,b_) && counter < 5) {
+    while(not_equal(a_,b_) ) {
         if(BigInteger::GreaterThan((word*)a_.GetData(), (word*)b_.GetData(), NUM_WORDS_1024, NUM_WORDS_1024)) {
             print_word((word*)a_.GetData(), NUM_WORDS_1024, "a");
             print_word((word*)b_.GetData(), NUM_WORDS_1024, "b");
@@ -102,7 +103,8 @@ BigInteger1024 paillier::gcd(const BigInteger1024& a, const BigInteger1024& b) {
         counter++;
     }
 
-    BigInteger1024 r = a_;
+    BigInteger1024 r;
+    memcpy(r.GetData(), a.GetData(), NUM_BYTES_1024);
     return r;
 }
 
