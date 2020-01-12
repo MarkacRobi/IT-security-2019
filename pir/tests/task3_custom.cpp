@@ -209,6 +209,18 @@ START_TEST(multiplication_empty_1024_2048){
     }
 END_TEST
 
+START_TEST(division_empty_2048_1024){
+        auto res = BigInteger2048() / BigInteger1024();
+        ck_assert_bi_eq(res, BigInteger1024());
+    }
+END_TEST
+
+START_TEST(division_zero_2048_1024){
+        auto res = BigInteger2048(0) / BigInteger1024(0);
+        ck_assert_bi_eq(res, BigInteger1024(0));
+    }
+END_TEST
+
 START_TEST(zero_greater_than_1024){
         const BigInteger1024 a = BigInteger1024(0);
         const BigInteger1024 b = BigInteger1024(0);
@@ -222,6 +234,47 @@ START_TEST(empty_greater_than_1024){
     }
 END_TEST
 
+START_TEST(zero_greater_than_2048){
+        const BigInteger2048 a = BigInteger2048(0);
+        const BigInteger2048 b = BigInteger2048(0);
+        ck_assert_int_eq(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_2048), false);
+    }
+END_TEST
+
+START_TEST(empty_greater_than_2048){
+        const BigInteger2048 a = BigInteger2048();
+        const BigInteger2048 b = BigInteger2048();
+        ck_assert_int_eq(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_2048), false);
+    }
+END_TEST
+
+
+START_TEST(zero_smaller_than_1024){
+        const BigInteger1024 a = BigInteger1024(0);
+        const BigInteger1024 b = BigInteger1024(0);
+        ck_assert_int_eq(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_WORDS_1024), false);
+    }
+END_TEST
+START_TEST(empty_smaller_than_1024){
+        const BigInteger1024 a = BigInteger1024();
+        const BigInteger1024 b = BigInteger1024();
+        ck_assert_int_eq(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_WORDS_1024), false);
+    }
+END_TEST
+
+START_TEST(zero_smaller_than_2048){
+        const BigInteger2048 a = BigInteger2048(0);
+        const BigInteger2048 b = BigInteger2048(0);
+        ck_assert_int_eq(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_2048), false);
+    }
+END_TEST
+
+START_TEST(empty_smaller_than_2048){
+        const BigInteger2048 a = BigInteger2048();
+        const BigInteger2048 b = BigInteger2048();
+        ck_assert_int_eq(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_2048, NUM_WORDS_2048), false);
+    }
+END_TEST
 
 
 int main(int argc, char** argv)
@@ -260,8 +313,16 @@ int main(int argc, char** argv)
     tcase_add_test(tcase_bigInt, multiplication_zero_1024_2048);
     tcase_add_test(tcase_bigInt, multiplication_empty_2048_1024);
     tcase_add_test(tcase_bigInt, multiplication_empty_1024_2048);
+    tcase_add_test(tcase_bigInt, division_empty_2048_1024);
+    tcase_add_test(tcase_bigInt, division_zero_2048_1024);
     tcase_add_test(tcase_bigInt, zero_greater_than_1024);
     tcase_add_test(tcase_bigInt, empty_greater_than_1024);
+    tcase_add_test(tcase_bigInt, zero_greater_than_2048);
+    tcase_add_test(tcase_bigInt, empty_greater_than_2048);
+    tcase_add_test(tcase_bigInt, zero_smaller_than_1024);
+    tcase_add_test(tcase_bigInt, empty_smaller_than_1024);
+    tcase_add_test(tcase_bigInt, zero_smaller_than_2048);
+    tcase_add_test(tcase_bigInt, empty_smaller_than_2048);
 
     suite_add_tcase(suite, tcase_bigInt);
 
