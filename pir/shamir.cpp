@@ -29,7 +29,7 @@ std::vector<BigInteger1024> getLagrange(const std::vector<BigInteger1024>& share
                 d = d * (shares[j] - shares[i]);
             }
         }
-        BigInteger1024 inverse = BigInteger1024::Inverse(d.GetData()[i]);
+        BigInteger1024 inverse = BigInteger1024::Inverse(d);
         //temp_c = n * inverse;
         c.push_back(n * inverse);
     }

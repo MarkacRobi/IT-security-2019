@@ -257,30 +257,63 @@ bool checkIfModulusIsZero(BigInteger1024 b)
     return isZero;
 }
 
-BigInteger1024 static calcMod(BigInteger2048 a, BigInteger1024 b)
+void calcMod(word* a, word* b, word* s, word* t, word* d)
 {
-//    printf("b is ");
-//        for(int i = 0; i < 128; i++)
-//        printf("%x", b.GetModulus()[i]);
-//    printf("\n");
-//
-//
-//    printf("a is ");
+
+//    printf("aaa is ");
 //    for(int i = 0; i < 128; i++)
 //        printf("%x", a.GetData()[i]);
 //    printf("\n");
+//
+//    printf("bb is ");
+//        for(int i = 0; i < 128; i++)
+//        printf("%x", b.GetData()[i]);
+//    printf("\n");
+
 
 
     BigInteger1024 res;
     for(int i = 0; i < 128; i++)
     {
         //printf("a %x\n", a.GetData()[i]);
-        //printf("b %x\n", b.GetModulus()[i]);
-        res.GetData()[i] = a.GetData()[i] % b.GetModulus()[i];
+        //printf("b %x\n", b.GetData()[i]);
+        if(b[i] != 0)
+            res.GetData()[i] = a[i] % b[i];
+        else
+            res.GetData()[i] = 0;
         //printf("res %x\n", res.GetData()[i]);
     }
 
-    return res;
+//    printf("res is ");
+//    for(int i = 0; i < 128; i++)
+//        printf("%x", res.GetData()[i]);
+//    printf("\n");
+
+    if(checkIfModulusIsZero(res))
+    {
+        printf("nula je\n");
+    }
+    else
+        calcMod(b, (word*)res.GetData(), s, t, d);
+
+    BigInteger1024 d1;
+    memcpy(d1.GetData(), d, NUM_BYTES_1024);
+    BigInteger1024 s1;
+    memcpy(s1.GetData(), t, NUM_BYTES_1024);
+
+    BigInteger2048 a_temp;
+    memcpy(a_temp.GetData(), a, NUM_BYTES_2048);
+
+    BigInteger1024 b_temp;
+    memcpy(b_temp.GetData(), b, NUM_BYTES_1024);
+
+    BigInteger1024 s_temp;
+    memcpy(s_temp.GetData(), s, NUM_BYTES_1024);
+
+    BigInteger1024 t1 = s_temp - (a_temp / b_temp) * s1;
+
+
+    //return final_res;
 }
 
 BigInteger1024 static ExtEuclidian(BigInteger2048 a, BigInteger1024 b)
@@ -300,30 +333,40 @@ BigInteger1024 static ExtEuclidian(BigInteger2048 a, BigInteger1024 b)
     //check if b == 0
 
 
-    BigInteger1024 res = calcMod(a, b);
+//    BigInteger1024 res = calcMod(a, b);
+//
+//        printf("res is ");
+//    for(int i = 0; i < 128; i++)
+//        printf("%x", res.GetData()[i]);
+//    printf("\n");
+//
+//
+//    BigInteger1024 res2 = calcMod(b, res);
+//
+//    BigInteger1024 res3 = calcMod(res, res2);
+//
+//    printf("res2 is ");
+//    for(int i = 0; i < 128; i++)
+//        printf("%x", res2.GetData()[i]);
+//    printf("\n");
+//
+//
+//    printf("res3 is ");
+//    for(int i = 0; i < 128; i++)
+//        printf("%x", res3.GetData()[i]);
+//    printf("\n");
 
-        printf("res is ");
+    BigInteger1024 s;
+    BigInteger1024 t;
+    BigInteger1024 d;
+    calcMod((word*)a.GetData(), (word*)b.GetData(), (word*)s.GetData(), (word*)t.GetData(), (word*)d.GetData());
+        printf("s is ");
     for(int i = 0; i < 128; i++)
-        printf("%x", res.GetData()[i]);
+        printf("%x", s.GetData()[i]);
     printf("\n");
 
 
-    BigInteger1024 res2 = calcMod(b, res);
-
-    printf("res2 is ");
-    for(int i = 0; i < 128; i++)
-        printf("%x", res2.GetData()[i]);
-    printf("\n");
-
-
-//    while(!checkIfModulusIsZero(calcMod(a, b)))
-//    {
-//        printf("nije nula\n");
-//    }
-
-    //printf("jeste nula\n");
-
-    return BigInteger1024(0);
+    return s;
 
 }
 
@@ -332,6 +375,7 @@ BigInteger1024 static ExtEuclidian(BigInteger2048 a, BigInteger1024 b)
 BigInteger1024 BigInteger1024::Inverse(const BigInteger1024& a) {
   // TODO: To implement
   BigInteger1024 b;//modulus
+  memcpy(b.GetData(), b.GetModulus(), NUM_BYTES_1024);
   BigInteger2048 a_ = BigInteger2048(a);//check this TODO
 
   BigInteger1024 inverse = ExtEuclidian(a_, b);
