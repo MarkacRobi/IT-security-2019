@@ -364,13 +364,13 @@ BigInteger1024 gcdExtended(word* a, word* b, word* x, word* y)
 BigInteger1024 BigInteger1024::Inverse(const BigInteger1024& a) {
   // TODO: To implement
 
-  BigInteger1024 b;//modulus
-  memcpy(b.GetData(), b.GetModulus(), NUM_BYTES_1024);
+  //BigInteger1024 b;//modulus
+  //memcpy(b.GetData(), b.GetModulus(), NUM_BYTES_1024);
 
   //BigInteger1024 a_ = BigInteger1024(a);//check this TODO
 
   //BigInteger1024 inverse = ExtEuclidian(a_, b);
-    BigInteger1024 x;
+ /*   BigInteger1024 x;
     BigInteger1024 y;
   BigInteger1024 gcd = gcdExtended((word*)a.GetData(), (word*)b.GetData(), (word*)x.GetData(), (word*)y.GetData());
 
@@ -380,7 +380,21 @@ BigInteger1024 BigInteger1024::Inverse(const BigInteger1024& a) {
 
 
 
-  return result;
+  return result;*/
+    const std::string exp("ad7ea541780f40507ad3b837bc3049331aaee8610dcd93472a182a206c1b166fa9bd2b39b3cd083e6b7bd175b22b16592bd21a518028b0ee6f3ca01d26219cf732922de3972fc370d7c39eef834c89719282eecbba176bcafd94958f0003e8cd0f23abe74de3f207d350be06aef90e4b5169d0528a1012b4c2441d1f27448ca3");
+    BigInteger1024 exp_ = BigInteger1024(exp);
+
+    auto res = BigInteger1024::PowerMod(a, exp);
+
+    //calcMod((word*)a.GetData(), (word*)b.GetData(), (word*)s.GetData(), (word*)t.GetData(), (word*)d.GetData());
+//    printf("p is ");
+//    for(int i = 0; i < 65; i++)
+//        printf("%x", primes::p.GetData()[i]);
+//    printf("\n");
+
+
+    return res;
+
 }
 
 std::vector<BigInteger1024> BigInteger1024::FromFile(const std::string &filename) {
