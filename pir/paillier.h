@@ -26,6 +26,8 @@ public:
     static BigInteger1024 gcd(const BigInteger1024& a, const BigInteger1024& b);
     // L(u) = floor((u - 1) / m)
     static BigInteger1024 L(const BigInteger1024& u);
+    //  util function to check if two bigInts are not equal
+    static bool not_equal(const BigInteger1024& a, const BigInteger1024& b);
 
     // Encrypt & Decrypt
     BigInteger2048 encrypt(const BigInteger1024 &plaintext);

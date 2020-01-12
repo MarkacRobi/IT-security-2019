@@ -47,7 +47,7 @@ BigInteger2048 paillier::encrypt(const BigInteger1024 &plaintext)
     return BigInteger2048();
 }
 
-bool not_equal(const BigInteger1024& a, const BigInteger1024& b) {
+bool paillier::not_equal(const BigInteger1024& a, const BigInteger1024& b) {
     if(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_BYTES_1024)) {
         return true;
     }
