@@ -1,6 +1,7 @@
 #include "paillier.h"
 #include "bigint/BigInteger.h"
 #include "primes.h"
+#include "string"
 
 paillier::paillier(){
     // \TODO Initialize g with a random number
@@ -47,13 +48,24 @@ BigInteger2048 paillier::encrypt(const BigInteger1024 &plaintext)
     return BigInteger2048();
 }
 
+void print_word(word* c, uint32 num_words_operands, std::string w) {
+    printf("Printing word: %s \n", w.c_str());
+    for (size_t i = 0; i <= num_words_operands - 1; i++) {
+//         printf("%u|", (unsigned int)c[i]);
+        std::cout << std::hex << static_cast<int>(c[i]);
+    }
+//        stream  << std::hex << c;
+//        std::cout << stream.str();
+    printf("\n");
+
+}
+
+
 bool paillier::not_equal(const BigInteger1024& a, const BigInteger1024& b) {
     if(BigInteger::GreaterThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_WORDS_1024)) {
-        printf("a is greater than b\n");
         return true;
     }
     if(BigInteger::SmallerThan((word*)a.GetData(), (word*)b.GetData(), NUM_WORDS_1024, NUM_WORDS_1024)) {
-        printf("a is smaller than b\n");
         return true;
     }
     printf("a is not greater or smaller than b -> returning false\n");
@@ -64,23 +76,34 @@ BigInteger1024 paillier::L(const BigInteger1024& u_) {
     return BigInteger2048(u_ - one) / m;
 }
 // lcm we need to calculate lambda = lcm(p - 1, q - 1)
-BigInteger1024 paillier::lcm(const BigInteger1024& p_minus_1, const BigInteger1024& q_minus_1) {
+BigInteger1024 paillier::lcm(const BigInteger1024 p_minus_1, const BigInteger1024 q_minus_1) {
     return BigInteger2048(p_minus_1 * q_minus_1) / gcd(p_minus_1, q_minus_1);
 }
 // Euclidean algorithm, page 36 - Algorithm 9 TODO: check if making new BigInt1024 objects makes sense
 BigInteger1024 paillier::gcd(const BigInteger1024& a, const BigInteger1024& b) {
     BigInteger1024 a_ = BigInteger1024(a);
     BigInteger1024 b_ = BigInteger1024(b);
+//    print_word((word*)a_.GetData(), NUM_WORDS_1024, "a");
+//    print_word((word*)b_.GetData(), NUM_WORDS_1024, "b");
 
-    while(not_equal(a_,b_)) {
-        if(BigInteger::GreaterThan((word*)a_.GetData(), (word*)b_.GetData(), NUM_WORDS_1024, NUM_BYTES_1024)) {
+    int counter = 0;
+    while(not_equal(a_,b_) && counter < 5) {
+        if(BigInteger::GreaterThan((word*)a_.GetData(), (word*)b_.GetData(), NUM_WORDS_1024, NUM_WORDS_1024)) {
+            print_word((word*)a_.GetData(), NUM_WORDS_1024, "a");
+            print_word((word*)b_.GetData(), NUM_WORDS_1024, "b");
             a_ = a_ - b_;
+            print_word((word*)a_.GetData(), NUM_WORDS_1024, "a after - b");
+            printf("****************************************\n");
         } else {
+            print_word((word*)b_.GetData(), NUM_WORDS_1024, "b before - a");
             b_ = b_ - a_;
+            print_word((word*)b_.GetData(), NUM_WORDS_1024, "b after - a");
         }
+        counter++;
     }
 
-    BigInteger1024 r = BigInteger1024(a_);
+    BigInteger1024 r = a_;
     return r;
 }
+
 

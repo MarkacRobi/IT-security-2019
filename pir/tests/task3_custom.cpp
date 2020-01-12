@@ -41,10 +41,17 @@ namespace
     const BigInteger1024 one_1024 = BigInteger1024(1);
 }
 
- START_TEST(lcm){
-    ck_assert_bi_eq(paillier::lcm(as[0],bs[0]), zero_1024);
- }
- END_TEST
+START_TEST(lcm){
+        ck_assert_bi_eq(paillier::lcm(as[0],bs[0]), zero_1024);
+    }
+END_TEST
+
+START_TEST(gcd){
+        BigInteger1024 a = BigInteger1024(10);
+        BigInteger1024 b = BigInteger1024(2);
+        ck_assert_bi_eq(paillier::gcd(a,b), BigInteger1024(10));
+    }
+END_TEST
 
 START_TEST(not_equals_empty){
         printf("Testing not_equals_empty:\n");
@@ -223,7 +230,8 @@ int main(int argc, char** argv)
 
    TCase* tcase_paillier = tcase_create("Paillier");
 //   tcase_add_test(tcase_paillier, lcm);
-   tcase_add_test(tcase_paillier, not_equals_zero);
+    tcase_add_test(tcase_paillier, gcd);
+    tcase_add_test(tcase_paillier, not_equals_zero);
     tcase_add_test(tcase_paillier, not_equals_empty);
    suite_add_tcase(suite, tcase_paillier);
 
