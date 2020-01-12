@@ -25,5 +25,6 @@ class shamir
         std::vector<BigInteger1024> generateIndices(uint8_t numShares);
 
         void setIndices(const std::vector<BigInteger1024> &indices);
+        std::vector<BigInteger1024>polynomial;
 };
 #endif

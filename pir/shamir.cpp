@@ -11,17 +11,16 @@
 shamir::shamir(uint8_t degree):degree(degree){
 }
 
-std::vector<BigInteger1024> getLagrange(const std::vector<BigInteger1024>& shares, uint8_t degree)
+std::vector<BigInteger1024> getLagrange(const std::vector<BigInteger1024>& shares)
 {
     std::vector<BigInteger1024> c;
-    BigInteger1024 temp_c(0);
 
-    for(int i=0; i<degree; i++)
+    for(int i=0; i< shares.size(); i++)
     {
-        BigInteger1024 n(1);
-        BigInteger1024 d(1);
+        BigInteger1024 n;
+        BigInteger1024 d;
 
-        for(int j=0; j<degree; j++)
+        for(int j=0; j < shares.size(); j++)
         {
             if(i != j)
             {
@@ -30,41 +29,21 @@ std::vector<BigInteger1024> getLagrange(const std::vector<BigInteger1024>& share
             }
         }
         BigInteger1024 inverse = BigInteger1024::Inverse(d);
-        //temp_c = n * inverse;
-        c.push_back(n * inverse);
+        BigInteger1024 result = inverse * n;
+        c.emplace_back(result);
     }
-    /*for(int i=0; i<c.size(); i++)
-    {
-        printf("BigInt is: %x\n", c.at(i).GetData()[i]);
-    }*/
+
     return c;
 }
-
 BigInteger1024 shamir::reconstructSecret(const std::vector<BigInteger1024>& shares){
 
-    std::vector<BigInteger1024> laGrange = getLagrange(shares, degree+1);
-    printf("Pao\n");
-    BigInteger1024 result(0);
+    std::vector<BigInteger1024> laGrange = getLagrange(indices);
     BigInteger1024 prvi_temp(0);
-    BigInteger2048 temp(0);
-    BigInteger2048 needed_value(0);
-    BigInteger1024 r(0);
-    BigInteger2048 c(0);
-    for (auto i=0; i<degree+1; i++)
+    printf("kurcina moja %lu\n", indices.size());
+    for (size_t i=0; i<indices.size(); i++)
     {
         prvi_temp = prvi_temp + laGrange[i] * shares[i];
-        /*BigInteger::MultiplyIntegers((word*)temp.GetData(), (word*)laGrange[i].GetData(),
-                (word*)shares[i].GetData(), NUM_WORDS_1024);*/
-
-        //memcpy((void*)needed_value.GetData(), (void*)temp.GetData(), NUM_BYTES_1024);
-
-        //result = result + prvi_temp;
-        /*BigInteger::AddIntegers((word*)c.GetData(), (word*)r.GetData(),(word*)needed_value.GetData(),
-                (word*)(c.GetData()+NUM_BYTES_1024), NUM_WORDS_1024);
-
-        mempcpy((void*)r.GetData(), (void*)c.GetData(), NUM_BYTES_1024);*/
     }
-    printf("pao");
     return prvi_temp;
 }
 std::vector<BigInteger1024> shamir::generateShamirShares(){
@@ -75,13 +54,40 @@ std::vector<BigInteger1024> shamir::generateShamirShares(){
 std::vector<BigInteger1024> shamir::generateShamirPolynomial(const BigInteger1024& secret){
     // TODO: Generate a random Shamir polynomial for the given secret and store it.
     //       Return a vector with the coefficients starting with the coefficient of the constant term.
-    return std::vector<BigInteger1024>();
+
+    //if(polynomial.size() == 0)
+    std::vector<BigInteger1024>polynomial_temp;
+
+    for(int i = 0; i < degree + 1; i++)
+    {
+        if(i == 0)
+        {
+            polynomial_temp.push_back(secret);
+            polynomial.push_back(secret);
+        }
+        else
+        {
+            BigInteger1024 temp;
+            temp.Randomize();
+
+            polynomial.push_back(temp);
+            polynomial_temp.push_back(temp);
+        }
+    }
+    return polynomial_temp;
 }
 
 std::vector<BigInteger1024> shamir::generateIndices(uint8_t numShares) {
     // TODO: Generate and store numShares random indices
     //       Return a vector containing them in the order in which they were generated.
-    return std::vector<BigInteger1024>();
+    for(int i = 0; i < numShares; i++)
+    {
+        BigInteger1024 random;
+        random.Randomize();
+        indices.push_back(random);
+    }
+    setIndices(indices);
+    return indices;
 }
 
 void shamir::setIndices(const std::vector<BigInteger1024> &indices) {
