@@ -11,14 +11,15 @@
 shamir::shamir(uint8_t degree):degree(degree){
 }
 
-std::vector<BigInteger1024> getLagrange(const std::vector<BigInteger1024>& shares)
+
+std::vector<BigInteger1024> getLagrange(std::vector<BigInteger1024>& shares)
 {
     std::vector<BigInteger1024> c;
 
     for(int i=0; i< shares.size(); i++)
     {
-        BigInteger1024 n;
-        BigInteger1024 d;
+        BigInteger1024 d(1);
+        BigInteger1024 n(1);
 
         for(int j=0; j < shares.size(); j++)
         {
@@ -30,22 +31,25 @@ std::vector<BigInteger1024> getLagrange(const std::vector<BigInteger1024>& share
         }
         BigInteger1024 inverse = BigInteger1024::Inverse(d);
         BigInteger1024 result = inverse * n;
-        c.emplace_back(result);
+        c.push_back(result);
     }
 
     return c;
 }
-BigInteger1024 shamir::reconstructSecret(const std::vector<BigInteger1024>& shares){
 
+BigInteger1024 shamir::reconstructSecret(const std::vector<BigInteger1024>& shares)
+{
     std::vector<BigInteger1024> laGrange = getLagrange(indices);
-    BigInteger1024 prvi_temp(0);
-    printf("kurcina moja %lu\n", indices.size());
-    for (size_t i=0; i<indices.size(); i++)
+    BigInteger1024 result(0);
+
+    for (auto i=0; i < shares.size(); i++)
     {
-        prvi_temp = prvi_temp + laGrange[i] * shares[i];
+        result = result + laGrange[i] * shares[i];
     }
-    return prvi_temp;
+
+    return result;
 }
+
 std::vector<BigInteger1024> shamir::generateShamirShares(){
     // TODO: generate the Shamir shares using the polynomial and indices which have to be created previously and return them
     return std::vector<BigInteger1024>();
