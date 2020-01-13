@@ -469,7 +469,7 @@ int main(int argc, char** argv)
     //tcase_add_test(tcase_bigInt, zero_smaller_than_2048);
     //tcase_add_test(tcase_bigInt, empty_smaller_than_2048);
 
-    //suite_add_tcase(suite, tcase_bigInt);
+    suite_add_tcase(suite, tcase_bigInt);
 
 
 
