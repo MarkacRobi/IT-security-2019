@@ -58,7 +58,7 @@ endif()
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.62 REQUIRED COMPONENTS system)
-
+set(PROTOCOLS "true")
 if( PROTOCOLS )
   message("linking against reference Bigint lib")
   add_definitions("-DPROTOCOLS")
